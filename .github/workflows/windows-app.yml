@@ -1,0 +1,36 @@
+name: Windows app
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - cursor/javafx-laser-cooling-scaffold
+      - main
+      - master
+    paths:
+      - src/**
+      - pom.xml
+      - package-win.ps1
+      - .github/workflows/windows-app.yml
+
+jobs:
+  package:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Build Windows app
+        shell: pwsh
+        run: .\package-win.ps1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LaserCooling-windows-x64
+          path: target/dist/LaserCooling-1.0-windows-x64.zip
+          if-no-files-found: error

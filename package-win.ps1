@@ -4,11 +4,11 @@ $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
 if ($env:OS -ne "Windows_NT") {
-    Write-Error "Сборку .exe нужно делать на Windows, не на Mac."
+    Write-Error "Build the .exe on Windows, not on a Mac."
 }
 
 if (-not $env:JAVA_HOME -or -not (Test-Path (Join-Path $env:JAVA_HOME "bin\jpackage.exe"))) {
-    Write-Error "Нужен JDK 21+ с jpackage. Установите Temurin и задайте JAVA_HOME."
+    Write-Error "Need JDK 21+ with jpackage. Install Temurin and set JAVA_HOME."
 }
 
 $env:Path = "$(Join-Path $env:JAVA_HOME 'bin');$env:Path"
@@ -25,7 +25,7 @@ Write-Host "JDK: $env:JAVA_HOME"
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 if (-not (Test-Path $RuntimeImage)) {
-    Write-Error "jlink не создал $RuntimeImage"
+    Write-Error "jlink did not create $RuntimeImage"
 }
 
 if (Test-Path $Dest) {
@@ -51,9 +51,9 @@ if (Test-Path $Zip) {
 Compress-Archive -Path (Join-Path $Dest $AppName) -DestinationPath $Zip
 
 Write-Host ""
-Write-Host "Готово:"
+Write-Host "Done:"
 Write-Host "  $Dest\$AppName\$AppName.exe"
 Write-Host "  $Zip"
 Write-Host ""
-Write-Host "Нужна вся папка $AppName, не один .exe."
-Write-Host "Первый запуск: Windows может показать SmartScreen → Подробнее → Выполнить в любом случае."
+Write-Host "Ship the whole $AppName folder, not just the .exe."
+Write-Host "First launch: SmartScreen may appear → More info → Run anyway."

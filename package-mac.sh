@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 if [[ "$(uname -s)" != Darwin ]]; then
-  echo "Сборку .app нужно делать на этом Mac, не на Windows/Linux."
+  echo "Build the .app on this Mac, not on Windows or Linux."
   exit 1
 fi
 
@@ -20,7 +20,7 @@ if [[ -z "${JAVA_HOME:-}" ]]; then
 fi
 
 if [[ -z "${JAVA_HOME:-}" || ! -x "${JAVA_HOME}/bin/jpackage" ]]; then
-  echo "Нужен JDK 21+ с jpackage. Установите Temurin и задайте JAVA_HOME."
+  echo "Need JDK 21+ with jpackage. Install Temurin and set JAVA_HOME."
   exit 1
 fi
 
@@ -38,7 +38,7 @@ java -version
 ./mvnw -DskipTests javafx:jlink
 
 if [[ ! -d "${RUNTIME_IMAGE}" ]]; then
-  echo "jlink не создал ${RUNTIME_IMAGE}"
+  echo "jlink did not create ${RUNTIME_IMAGE}"
   exit 1
 fi
 
@@ -68,9 +68,9 @@ jpackage \
   --mac-package-name "${APP_NAME}"
 
 echo
-echo "Готово:"
+echo "Done:"
 echo "  ${DEST}/${APP_NAME}.app"
 echo "  ${DEST}/${APP_NAME}-${VERSION}.dmg"
 echo
-echo "Первый запуск: правый клик по .app → Открыть (Gatekeeper)."
-echo "Или: xattr -cr \"${DEST}/${APP_NAME}.app\" && open \"${DEST}/${APP_NAME}.app\""
+echo "First launch: right-click the .app → Open (Gatekeeper)."
+echo "Or: xattr -cr \"${DEST}/${APP_NAME}.app\" && open \"${DEST}/${APP_NAME}.app\""

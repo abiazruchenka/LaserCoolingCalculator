@@ -1,8 +1,7 @@
-module ipg.coolingcalculator.lasercoolingcalculator {
+module ipg.cooling {
     requires javafx.controls;
     requires javafx.fxml;
 
-
-    opens ipg.coolingcalculator.lasercoolingcalculator to javafx.fxml;
-    exports ipg.coolingcalculator.lasercoolingcalculator;
+    opens ipg.cooling to javafx.fxml;
+    exports ipg.cooling;
 }

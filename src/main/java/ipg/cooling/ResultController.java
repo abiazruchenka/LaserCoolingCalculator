@@ -1,14 +1,14 @@
-package ipg.coolingcalculator.lasercoolingcalculator;
+package ipg.cooling;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
-public class HelloController {
+public class ResultController {
     @FXML
     private Label welcomeText;
 
     @FXML
-    protected void onHelloButtonClick() {
+    protected void onCalculateButtonClick() {
         welcomeText.setText("Welcome to JavaFX Application!");
     }
 }

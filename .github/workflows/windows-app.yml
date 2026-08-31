@@ -32,5 +32,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: LaserCooling-windows-x64
-          path: target/dist/LaserCooling-1.0-windows-x64.zip
+          path: target/dist/LaserCooling-*-windows-x64.zip
           if-no-files-found: error

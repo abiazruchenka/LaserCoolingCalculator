@@ -24,7 +24,7 @@ class CoolingCalculatorTest {
         CoolingRequest request = sampleRequest(0.008, 0.4, 1.5e-5);
         CoolingResult result = calculator.evaluate(request, 0.008, 0.4, 1.5e-5);
         WaterProperties water = WaterProperties.atCelsius(request.inletTempC() + result.waterRiseK() / 2.0);
-        double expectedRise = request.heatPowerW()
+        double expectedRise = request.heatLoadW()
                 / (water.densityKgM3() * 1.5e-5 * water.specificHeatJkgK());
         assertEquals(expectedRise, result.waterRiseK(), 0.05);
     }
@@ -55,8 +55,8 @@ class CoolingCalculatorTest {
     @Test
     void autoDesignFor500WStaysWithinLimits() {
         CoolingRequest request = new CoolingRequest(
-                500, 20, 45, 8, TubeMaterial.COPPER, 0.001,
-                null, null, null, 2e5
+                500, 0.5, 0.93, 20, 45, 8, TubeMaterial.COPPER, 0.001,
+                null, null, null, 2e5, 0, 0.04
         );
         CoolingResult result = calculator.calculate(request);
         assertTrue(result.wallLimitOk(), result.recommendation());
@@ -70,8 +70,8 @@ class CoolingCalculatorTest {
     @Test
     void rejectsNonPositiveHeatLoad() {
         CoolingRequest request = new CoolingRequest(
-                0, 20, 45, 8, TubeMaterial.COPPER, 0.001,
-                0.008, 0.4, 1.5e-5, 2e5
+                0, 0.5, 0.93, 20, 45, 8, TubeMaterial.COPPER, 0.001,
+                0.008, 0.4, 1.5e-5, 2e5, 0, 0.04
         );
         assertThrows(IllegalArgumentException.class, () -> calculator.calculate(request));
     }
@@ -111,8 +111,8 @@ class CoolingCalculatorTest {
     @Test
     void moreIterationsCanFindLowerOrEqualWallTemperature() {
         CoolingRequest request = new CoolingRequest(
-                500, 20, 45, 8, TubeMaterial.COPPER, 0.001,
-                null, null, null, 2e5
+                500, 0.5, 0.93, 20, 45, 8, TubeMaterial.COPPER, 0.001,
+                null, null, null, 2e5, 0, 0.04
         );
         OptimizerSettings coarse = new OptimizerSettings(
                 0.004, 0.010, true,
@@ -167,10 +167,46 @@ class CoolingCalculatorTest {
         assertTrue(outcome.best().coolingConductanceWPerK() > 0);
     }
 
+    @Test
+    void serpentineUBendsRaisePressureDropAtFixedFlow() {
+        CoolingRequest straight = sampleRequest(0.0109, 3.6, 8.3e-5);
+        CoolingRequest plate = new CoolingRequest(
+                500, 0.5, 0.93, 20, 45, 8, TubeMaterial.STAINLESS_STEEL, 0.0009,
+                0.0109, 3.6, 8.3e-5, 2e5, 7, 0.028
+        );
+        CoolingResult straightResult = calculator.evaluate(straight, 0.0109, 3.6, 8.3e-5);
+        CoolingResult plateResult = calculator.evaluate(plate, 0.0109, 3.6, 8.3e-5);
+        assertEquals(0, straightResult.uBends());
+        assertEquals(7, plateResult.uBends());
+        assertTrue(plateResult.localLossK() > straightResult.localLossK());
+        assertTrue(plateResult.pressureDropPa() > straightResult.pressureDropPa());
+        assertTrue(plateResult.heatTransferCoeffWm2K() >= straightResult.heatTransferCoeffWm2K() - 1e-6);
+    }
+
+    @Test
+    void itoUBendLossFallsAsBendGetsGentler() {
+        assertTrue(CoolingCalculator.uBendLossK(0.0109, 0.020) > CoolingCalculator.uBendLossK(0.0109, 0.028));
+    }
+
+    @Test
+    void ml770At10LminMatchesSpecVelocity() {
+        CoolingRequest request = new CoolingRequest(
+                8000, 0.38, 0.93, 20, 45, 8, TubeMaterial.STAINLESS_STEEL, 0.0009,
+                0.0109, 3.6, 10.0 / 60_000.0, 2e5, 7, 0.028
+        );
+        CoolingResult result = calculator.evaluate(request, 0.0109, 3.6, 10.0 / 60_000.0);
+        assertEquals(1.79, result.velocityMps(), 0.02);
+        assertTrue(result.reynolds() > 15_000, "expected turbulent Re, got " + result.reynolds());
+        assertEquals(8_000 / 0.38, result.maxPowerConsumptionW(), 1.0);
+        assertEquals(8_000 / 0.38 - 8_000, result.chillerCapacityW(), 1.0);
+        assertEquals(40.0, result.recommendedFlowM3s() * 60_000.0, 0.01);
+        assertEquals(7, result.uBends());
+    }
+
     private static CoolingRequest sampleRequest(double diameterM, double lengthM, Double flowM3s) {
         return new CoolingRequest(
-                500, 20, 45, 8, TubeMaterial.COPPER, 0.001,
-                diameterM, lengthM, flowM3s, 2e5
+                500, 0.5, 0.93, 20, 45, 8, TubeMaterial.COPPER, 0.001,
+                diameterM, lengthM, flowM3s, 2e5, 0, 0.04
         );
     }
 }

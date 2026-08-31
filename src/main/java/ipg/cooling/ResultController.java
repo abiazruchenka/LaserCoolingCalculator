@@ -8,10 +8,13 @@ import ipg.cooling.calc.OptimizerSettings;
 import ipg.cooling.calc.TubeMaterial;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
@@ -26,10 +29,16 @@ public class ResultController {
     @FXML private Label titleLabel;
     @FXML private Label subtitleLabel;
     @FXML private MenuButton languageButton;
+    @FXML private Menu helpMenu;
+    @FXML private MenuItem aboutMenuItem;
     @FXML private Label inputsTitleLabel;
     @FXML private Label autoHintLabel;
-    @FXML private Label heatPowerLabel;
-    @FXML private TextField heatPowerField;
+    @FXML private Label laserPowerLabel;
+    @FXML private TextField laserPowerField;
+    @FXML private Label efficiencyLabel;
+    @FXML private TextField efficiencyField;
+    @FXML private Label powerFactorLabel;
+    @FXML private TextField powerFactorField;
     @FXML private Label inletTempLabel;
     @FXML private TextField inletTempField;
     @FXML private Label maxWallTempLabel;
@@ -42,6 +51,10 @@ public class ResultController {
     @FXML private TextField wallThicknessField;
     @FXML private Label maxPressureLabel;
     @FXML private TextField maxPressureField;
+    @FXML private Label bendsLabel;
+    @FXML private TextField bendsField;
+    @FXML private Label bendRadiusLabel;
+    @FXML private TextField bendRadiusField;
     @FXML private Label optimizerTitleLabel;
     @FXML private Label optimizerHintLabel;
     @FXML private Label minHeaderLabel;
@@ -65,6 +78,15 @@ public class ResultController {
     @FXML private Button optimizeButton;
     @FXML private Label statusLabel;
     @FXML private Label resultsTitleLabel;
+    @FXML private Label maxPowerResultLabel;
+    @FXML private Label maxPowerResult;
+    @FXML private Label apparentPowerResultLabel;
+    @FXML private Label apparentPowerResult;
+    @FXML private Label chillerResultLabel;
+    @FXML private Label chillerResult;
+    @FXML private Label recommendedFlowResultLabel;
+    @FXML private Label recommendedFlowResult;
+    @FXML private Label channelResultsTitleLabel;
     @FXML private Label innerDiameterResultLabel;
     @FXML private Label innerDiameterResult;
     @FXML private Label outerDiameterResultLabel;
@@ -91,6 +113,10 @@ public class ResultController {
     @FXML private Label efficiencyResult;
     @FXML private Label pressureResultLabel;
     @FXML private Label pressureResult;
+    @FXML private Label serpentineResultLabel;
+    @FXML private Label serpentineResult;
+    @FXML private Label localLossResultLabel;
+    @FXML private Label localLossResult;
     @FXML private Label resistanceResultLabel;
     @FXML private Label resistanceResult;
     @FXML private Label evaluatedResultLabel;
@@ -108,7 +134,7 @@ public class ResultController {
     public void initialize() {
         materialBox.setConverter(materialConverter());
         materialBox.getItems().setAll(TubeMaterial.values());
-        materialBox.getSelectionModel().select(TubeMaterial.COPPER);
+        materialBox.getSelectionModel().select(TubeMaterial.STAINLESS_STEEL);
         for (AppLanguage language : AppLanguage.values()) {
             MenuItem item = new MenuItem(language.displayName());
             item.setOnAction(event -> switchLanguage(language));
@@ -116,6 +142,25 @@ public class ResultController {
         }
         applyI18n();
         Platform.runLater(this::updateWindowTitle);
+    }
+
+    @FXML
+    private void onAbout() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, I18n.t("about.body", AppVersion.display(), AppVersion.author()), ButtonType.OK);
+        alert.setTitle(I18n.t("about.title"));
+        alert.setHeaderText(I18n.t("about.header"));
+        alert.initOwner(titleLabel.getScene() != null ? titleLabel.getScene().getWindow() : null);
+        alert.setResizable(true);
+        alert.getDialogPane().setMinWidth(560);
+        alert.getDialogPane().setPrefWidth(560);
+        alert.getDialogPane().setMinHeight(320);
+        alert.getDialogPane().setPrefHeight(360);
+        if (alert.getDialogPane().lookup(".content.label") instanceof Label content) {
+            content.setWrapText(true);
+            content.setPrefWidth(500);
+            content.setMinHeight(160);
+        }
+        alert.showAndWait();
     }
 
     @FXML
@@ -167,17 +212,23 @@ public class ResultController {
 
     private void applyI18n() {
         languageButton.setText(I18n.language().code());
+        helpMenu.setText(I18n.t("menu.help"));
+        aboutMenuItem.setText(I18n.t("menu.about"));
         titleLabel.setText(I18n.t("title"));
         subtitleLabel.setText(I18n.t("subtitle"));
         inputsTitleLabel.setText(I18n.t("section.inputs"));
         autoHintLabel.setText(I18n.t("hint.auto"));
-        heatPowerLabel.setText(I18n.t("label.heatPower"));
+        laserPowerLabel.setText(I18n.t("label.laserPower"));
+        efficiencyLabel.setText(I18n.t("label.efficiency"));
+        powerFactorLabel.setText(I18n.t("label.powerFactor"));
         inletTempLabel.setText(I18n.t("label.inletTemp"));
         maxWallTempLabel.setText(I18n.t("label.maxWallTemp"));
         maxWaterRiseLabel.setText(I18n.t("label.maxWaterRise"));
         materialLabel.setText(I18n.t("label.material"));
         wallThicknessLabel.setText(I18n.t("label.wallThickness"));
         maxPressureLabel.setText(I18n.t("label.maxPressure"));
+        bendsLabel.setText(I18n.t("label.bends"));
+        bendRadiusLabel.setText(I18n.t("label.bendRadius"));
         optimizerTitleLabel.setText(I18n.t("section.optimizer"));
         optimizerHintLabel.setText(I18n.t("hint.optimizer"));
         minHeaderLabel.setText(I18n.t("opt.min"));
@@ -190,6 +241,11 @@ public class ResultController {
         calculateButton.setText(I18n.t("button.calculate"));
         optimizeButton.setText(I18n.t("button.optimize"));
         resultsTitleLabel.setText(I18n.t("section.results"));
+        maxPowerResultLabel.setText(I18n.t("result.maxPower"));
+        apparentPowerResultLabel.setText(I18n.t("result.apparentPower"));
+        chillerResultLabel.setText(I18n.t("result.chiller"));
+        recommendedFlowResultLabel.setText(I18n.t("result.recommendedFlow"));
+        channelResultsTitleLabel.setText(I18n.t("section.heatSink"));
         innerDiameterResultLabel.setText(I18n.t("result.innerDiameter"));
         outerDiameterResultLabel.setText(I18n.t("result.outerDiameter"));
         lengthResultLabel.setText(I18n.t("result.length"));
@@ -203,6 +259,8 @@ public class ResultController {
         wallTempResultLabel.setText(I18n.t("result.wallTemp"));
         efficiencyResultLabel.setText(I18n.t("result.efficiency"));
         pressureResultLabel.setText(I18n.t("result.pressure"));
+        serpentineResultLabel.setText(I18n.t("result.serpentine"));
+        localLossResultLabel.setText(I18n.t("result.localLoss"));
         resistanceResultLabel.setText(I18n.t("result.resistance"));
         evaluatedResultLabel.setText(I18n.t("result.evaluated"));
         feasibleResultLabel.setText(I18n.t("result.feasible"));
@@ -226,7 +284,9 @@ public class ResultController {
 
     private CoolingRequest readRequest() {
         return new CoolingRequest(
-                required("label.heatPower", heatPowerField),
+                required("label.laserPower", laserPowerField),
+                required("label.efficiency", efficiencyField) / 100.0,
+                required("label.powerFactor", powerFactorField),
                 required("label.inletTemp", inletTempField),
                 required("label.maxWallTemp", maxWallTempField),
                 required("label.maxWaterRise", maxWaterRiseField),
@@ -235,7 +295,9 @@ public class ResultController {
                 required("label.innerDiameter", innerDiameterField) / 1000.0,
                 required("label.length", lengthField) / 1000.0,
                 required("label.flow", flowField) / 60_000.0,
-                required("label.maxPressure", maxPressureField) * 1e5
+                required("label.maxPressure", maxPressureField) * 1e5,
+                (int) Math.round(required("label.bends", bendsField)),
+                required("label.bendRadius", bendRadiusField) / 1000.0
         );
     }
 
@@ -261,6 +323,10 @@ public class ResultController {
     }
 
     private void showResult(CoolingResult result) {
+        maxPowerResult.setText(format(result.maxPowerConsumptionW() / 1000.0, 1, "unit.kw"));
+        apparentPowerResult.setText(format(result.apparentPowerVa() / 1000.0, 1, "unit.kva"));
+        chillerResult.setText(format(result.chillerCapacityW() / 1000.0, 1, "unit.kw"));
+        recommendedFlowResult.setText(format(result.recommendedFlowM3s() * 60_000.0, 0, "unit.lmin"));
         innerDiameterResult.setText(format(result.innerDiameterM() * 1000.0, 1, "unit.mm"));
         outerDiameterResult.setText(format(result.outerDiameterM() * 1000.0, 1, "unit.mm"));
         lengthResult.setText(format(result.lengthM() * 1000.0, 0, "unit.mm"));
@@ -274,6 +340,16 @@ public class ResultController {
         wallTempResult.setText(format(result.outerWallTempC(), 1, "unit.celsius"));
         efficiencyResult.setText(format(result.coolingConductanceWPerK(), 2, "unit.wPerK"));
         pressureResult.setText(format(result.pressureDropPa() / 1e5, 3, "unit.bar"));
+        if (result.uBends() <= 0) {
+            serpentineResult.setText(I18n.t("result.straightChannel"));
+        } else {
+            serpentineResult.setText(I18n.t(
+                    "result.serpentineValue",
+                    result.uBends(),
+                    result.bendRadiusM() * 1000.0
+            ));
+        }
+        localLossResult.setText(format(result.localLossK(), 2, null));
         resistanceResult.setText(format(result.thermalResistanceKw() * 1000.0, 2, "unit.kPerKw"));
         recommendationArea.setText(result.recommendation());
     }

@@ -6,8 +6,13 @@
 
     <groupId>ipg.cooling</groupId>
     <artifactId>LaserCoolingCalculator</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1</version>
     <name>LaserCoolingCalculator</name>
+    <developers>
+        <developer>
+            <name>Veranika Biazruchanka</name>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -42,6 +47,22 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>ipg/cooling/version.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>ipg/cooling/version.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

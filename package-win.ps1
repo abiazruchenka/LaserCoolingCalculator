@@ -14,11 +14,13 @@ if (-not $env:JAVA_HOME -or -not (Test-Path (Join-Path $env:JAVA_HOME "bin\jpack
 $env:Path = "$(Join-Path $env:JAVA_HOME 'bin');$env:Path"
 
 $AppName = "LaserCooling"
-$Version = "1.0"
+$FullVersion = ([regex]::Match((Get-Content -Raw "pom.xml"), "<version>([^<]+)</version>")).Groups[1].Value
+$Version = $FullVersion -replace "-SNAPSHOT$", ""
 $RuntimeImage = "target\app"
 $Dest = "target\dist"
 
 Write-Host "JDK: $env:JAVA_HOME"
+Write-Host "Version: $FullVersion (package $Version)"
 & java -version
 
 & .\mvnw.cmd -DskipTests javafx:jlink

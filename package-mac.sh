@@ -28,11 +28,13 @@ export JAVA_HOME
 export PATH="${JAVA_HOME}/bin:${PATH}"
 
 APP_NAME="LaserCooling"
-VERSION="1.0"
+VERSION="$(grep -m1 '<version>' pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/')"
+APP_VERSION="${VERSION%-SNAPSHOT}"
 RUNTIME_IMAGE="target/app"
 DEST="target/dist"
 
 echo "JDK: ${JAVA_HOME}"
+echo "Version: ${VERSION} (package ${APP_VERSION})"
 java -version
 
 ./mvnw -DskipTests javafx:jlink
@@ -48,7 +50,7 @@ mkdir -p "${DEST}"
 jpackage \
   --type app-image \
   --name "${APP_NAME}" \
-  --app-version "${VERSION}" \
+  --app-version "${APP_VERSION}" \
   --vendor IPG \
   --dest "${DEST}" \
   --runtime-image "${RUNTIME_IMAGE}" \
@@ -59,7 +61,7 @@ jpackage \
 jpackage \
   --type dmg \
   --name "${APP_NAME}" \
-  --app-version "${VERSION}" \
+  --app-version "${APP_VERSION}" \
   --vendor IPG \
   --dest "${DEST}" \
   --runtime-image "${RUNTIME_IMAGE}" \
@@ -70,7 +72,7 @@ jpackage \
 echo
 echo "Done:"
 echo "  ${DEST}/${APP_NAME}.app"
-echo "  ${DEST}/${APP_NAME}-${VERSION}.dmg"
+echo "  ${DEST}/${APP_NAME}-${APP_VERSION}.dmg"
 echo
 echo "First launch: right-click the .app → Open (Gatekeeper)."
 echo "Or: xattr -cr \"${DEST}/${APP_NAME}.app\" && open \"${DEST}/${APP_NAME}.app\""

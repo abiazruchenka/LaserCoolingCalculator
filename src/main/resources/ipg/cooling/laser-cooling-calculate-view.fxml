@@ -11,6 +11,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
@@ -31,6 +32,8 @@
         <VBox>
             <MenuBar styleClass="app-menu">
                 <Menu fx:id="helpMenu" text="Help">
+                    <MenuItem fx:id="helpTopicMenuItem" onAction="#onHelp" text="Calculation methodology"/>
+                    <SeparatorMenuItem/>
                     <MenuItem fx:id="aboutMenuItem" onAction="#onAbout" text="About"/>
                 </Menu>
             </MenuBar>

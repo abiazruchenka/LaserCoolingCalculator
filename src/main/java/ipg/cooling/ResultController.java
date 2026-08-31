@@ -20,6 +20,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.util.StringConverter;
 
 import java.text.NumberFormat;
@@ -30,6 +31,7 @@ public class ResultController {
     @FXML private Label subtitleLabel;
     @FXML private MenuButton languageButton;
     @FXML private Menu helpMenu;
+    @FXML private MenuItem helpTopicMenuItem;
     @FXML private MenuItem aboutMenuItem;
     @FXML private Label inputsTitleLabel;
     @FXML private Label autoHintLabel;
@@ -145,6 +147,12 @@ public class ResultController {
     }
 
     @FXML
+    private void onHelp() {
+        Window owner = titleLabel.getScene() != null ? titleLabel.getScene().getWindow() : null;
+        HelpWindow.show(owner);
+    }
+
+    @FXML
     private void onAbout() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, I18n.t("about.body", AppVersion.display(), AppVersion.author()), ButtonType.OK);
         alert.setTitle(I18n.t("about.title"));
@@ -213,7 +221,9 @@ public class ResultController {
     private void applyI18n() {
         languageButton.setText(I18n.language().code());
         helpMenu.setText(I18n.t("menu.help"));
+        helpTopicMenuItem.setText(I18n.t("menu.methodology"));
         aboutMenuItem.setText(I18n.t("menu.about"));
+        HelpWindow.applyI18n();
         titleLabel.setText(I18n.t("title"));
         subtitleLabel.setText(I18n.t("subtitle"));
         inputsTitleLabel.setText(I18n.t("section.inputs"));

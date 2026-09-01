@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public final class AppVersion {
-    private static final String FALLBACK_VERSION = "1.0.1";
+    private static final String FALLBACK_VERSION = "1.0.2";
     private static final String FALLBACK_AUTHOR = "Veranika Biazruchanka";
     private static final Properties PROPS = load();
 

@@ -17,6 +17,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -33,6 +35,10 @@ public class ResultController {
     @FXML private Menu helpMenu;
     @FXML private MenuItem helpTopicMenuItem;
     @FXML private MenuItem aboutMenuItem;
+    @FXML private TabPane mainTabs;
+    @FXML private Tab calcTab;
+    @FXML private Tab chartsTab;
+    @FXML private ChartsController chartsController;
     @FXML private Label inputsTitleLabel;
     @FXML private Label autoHintLabel;
     @FXML private Label laserPowerLabel;
@@ -143,6 +149,14 @@ public class ResultController {
             languageButton.getItems().add(item);
         }
         applyI18n();
+        if (chartsController != null) {
+            chartsController.setInputSource(this::readChartInput);
+            mainTabs.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, tab) -> {
+                if (tab == chartsTab) {
+                    chartsController.plotIfPossible();
+                }
+            });
+        }
         Platform.runLater(this::updateWindowTitle);
     }
 
@@ -224,6 +238,14 @@ public class ResultController {
         helpTopicMenuItem.setText(I18n.t("menu.methodology"));
         aboutMenuItem.setText(I18n.t("menu.about"));
         HelpWindow.applyI18n();
+        calcTab.setText(I18n.t("tab.calculator"));
+        chartsTab.setText(I18n.t("tab.charts"));
+        if (chartsController != null) {
+            chartsController.applyI18n();
+            if (mainTabs.getSelectionModel().getSelectedItem() == chartsTab) {
+                chartsController.plotIfPossible();
+            }
+        }
         titleLabel.setText(I18n.t("title"));
         subtitleLabel.setText(I18n.t("subtitle"));
         inputsTitleLabel.setText(I18n.t("section.inputs"));
@@ -308,6 +330,19 @@ public class ResultController {
                 required("label.maxPressure", maxPressureField) * 1e5,
                 (int) Math.round(required("label.bends", bendsField)),
                 required("label.bendRadius", bendRadiusField) / 1000.0
+        );
+    }
+
+    private ChartsController.Input readChartInput() {
+        CoolingRequest request = readRequest();
+        return new ChartsController.Input(
+                request,
+                required("opt.min", innerDiameterField) / 1000.0,
+                required("opt.max", diameterMaxField) / 1000.0,
+                required("opt.min", lengthField) / 1000.0,
+                required("opt.max", lengthMaxField) / 1000.0,
+                required("opt.min", flowField) / 60_000.0,
+                required("opt.max", flowMaxField) / 60_000.0
         );
     }
 

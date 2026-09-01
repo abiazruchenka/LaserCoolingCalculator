@@ -203,6 +203,25 @@ class CoolingCalculatorTest {
         assertEquals(7, result.uBends());
     }
 
+    @Test
+    void designCurvesFlowSweepRaisesHtcAndPressureDrop() {
+        CoolingRequest request = new CoolingRequest(
+                8000, 0.38, 0.93, 20, 45, 8, TubeMaterial.STAINLESS_STEEL, 0.0009,
+                0.0109, 3.6, 10.0 / 60_000.0, 2e5, 7, 0.028
+        );
+        var samples = DesignCurves.sweep(
+                calculator, request, DesignCurves.Axis.FLOW,
+                10.0 / 60_000.0, 30.0 / 60_000.0, 9
+        );
+        assertEquals(9, samples.size());
+        CoolingResult slow = samples.getFirst().result();
+        CoolingResult fast = samples.getLast().result();
+        assertTrue(fast.heatTransferCoeffWm2K() > slow.heatTransferCoeffWm2K());
+        assertTrue(fast.pressureDropPa() > slow.pressureDropPa());
+        assertTrue(fast.waterRiseK() < slow.waterRiseK());
+        assertTrue(fast.outerWallTempC() < slow.outerWallTempC());
+    }
+
     private static CoolingRequest sampleRequest(double diameterM, double lengthM, Double flowM3s) {
         return new CoolingRequest(
                 500, 0.5, 0.93, 20, 45, 8, TubeMaterial.COPPER, 0.001,

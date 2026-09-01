@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="ipg.cooling.ChartsController"
+            styleClass="root">
+    <top>
+        <HBox spacing="8" alignment="CENTER_LEFT" styleClass="chart-toolbar">
+            <padding>
+                <Insets top="0" right="0" bottom="8" left="0"/>
+            </padding>
+            <Label fx:id="sweepLabel" styleClass="field-label"/>
+            <ComboBox fx:id="sweepBox" prefWidth="200"/>
+            <Button fx:id="plotButton" onAction="#onPlot" styleClass="primary" minWidth="100"/>
+            <Label fx:id="chartsStatusLabel" styleClass="status" wrapText="true" maxWidth="Infinity"
+                   HBox.hgrow="ALWAYS"/>
+        </HBox>
+    </top>
+    <center>
+        <GridPane fx:id="chartsGrid" hgap="8" vgap="8">
+            <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="33.33"/>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="33.33"/>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="33.34"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints vgrow="ALWAYS" percentHeight="50"/>
+                <RowConstraints vgrow="ALWAYS" percentHeight="50"/>
+            </rowConstraints>
+        </GridPane>
+    </center>
+</BorderPane>

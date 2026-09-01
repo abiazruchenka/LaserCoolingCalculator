@@ -12,6 +12,8 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
@@ -25,11 +27,16 @@
             stylesheets="@app.css"
             styleClass="root">
     <padding>
-        <Insets top="16" right="16" bottom="16" left="16"/>
+        <Insets top="8" right="10" bottom="8" left="10"/>
     </padding>
 
     <top>
-        <VBox>
+        <HBox alignment="CENTER_LEFT" spacing="8" styleClass="header-row">
+            <VBox spacing="0" HBox.hgrow="ALWAYS">
+                <Label fx:id="titleLabel" styleClass="app-title" text="Laser water cooling"/>
+                <Label fx:id="subtitleLabel" styleClass="subtitle"
+                       text="Tube sizing for heat removal: diameter, length and water flow"/>
+            </VBox>
             <MenuBar styleClass="app-menu">
                 <Menu fx:id="helpMenu" text="Help">
                     <MenuItem fx:id="helpTopicMenuItem" onAction="#onHelp" text="Calculation methodology"/>
@@ -37,258 +44,239 @@
                     <MenuItem fx:id="aboutMenuItem" onAction="#onAbout" text="About"/>
                 </Menu>
             </MenuBar>
-            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="header-row">
-                <VBox spacing="4" HBox.hgrow="ALWAYS">
-                    <Label fx:id="titleLabel" styleClass="app-title" text="Laser water cooling"/>
-                    <Label fx:id="subtitleLabel" styleClass="subtitle" wrapText="true"
-                           text="Tube sizing for heat removal: diameter, length and water flow"/>
-                </VBox>
-                <MenuButton fx:id="languageButton" styleClass="lang-button" text="RU"/>
-            </HBox>
-        </VBox>
+            <MenuButton fx:id="languageButton" styleClass="lang-button" text="RU"/>
+        </HBox>
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true" fitToHeight="false" hbarPolicy="NEVER" styleClass="root-scroll">
-            <HBox spacing="16" alignment="TOP_LEFT" fillHeight="true">
-                <VBox spacing="10" styleClass="card" minWidth="420" prefWidth="480" HBox.hgrow="ALWAYS">
-                    <Label fx:id="inputsTitleLabel" styleClass="section-title" text="Input data"/>
-                    <Label fx:id="autoHintLabel" styleClass="hint" wrapText="true" maxWidth="Infinity"/>
+        <TabPane fx:id="mainTabs" styleClass="app-tabs" tabClosingPolicy="UNAVAILABLE">
+            <Tab fx:id="calcTab" closable="false" text="Calculator">
+                <content>
+                    <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" styleClass="root-scroll">
+                        <HBox spacing="10" alignment="TOP_LEFT" fillHeight="true">
 
-                    <GridPane hgap="10" vgap="8" maxWidth="Infinity">
-                        <columnConstraints>
-                            <ColumnConstraints hgrow="ALWAYS" minWidth="180" prefWidth="240" fillWidth="true"
-                                               halignment="LEFT"/>
-                            <ColumnConstraints hgrow="ALWAYS" minWidth="120" prefWidth="180" fillWidth="true"/>
-                        </columnConstraints>
+                            <VBox spacing="6" styleClass="card" minWidth="280" prefWidth="340" HBox.hgrow="ALWAYS">
+                                <Label fx:id="inputsTitleLabel" styleClass="section-title" text="Input data"/>
+                                <Label fx:id="autoHintLabel" styleClass="hint" wrapText="true" maxWidth="Infinity"/>
+                                <GridPane hgap="8" vgap="4" maxWidth="Infinity">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" minWidth="120" prefWidth="170"/>
+                                        <ColumnConstraints hgrow="ALWAYS" minWidth="80" prefWidth="120"/>
+                                    </columnConstraints>
 
-                        <Label fx:id="laserPowerLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                        <TextField fx:id="laserPowerField" text="8000" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                    <Label fx:id="laserPowerLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="laserPowerField" text="8000" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                        <Label fx:id="efficiencyLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                        <TextField fx:id="efficiencyField" text="38" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                    <Label fx:id="efficiencyLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="efficiencyField" text="38" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                        <Label fx:id="powerFactorLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                        <TextField fx:id="powerFactorField" text="0.93" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                    <Label fx:id="powerFactorLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="powerFactorField" text="0.93" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                        <Label fx:id="inletTempLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                        <TextField fx:id="inletTempField" text="20" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                                    <Label fx:id="inletTempLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="inletTempField" text="20" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-                        <Label fx:id="maxWallTempLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                        <TextField fx:id="maxWallTempField" text="45" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                                    <Label fx:id="maxWallTempLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="maxWallTempField" text="45" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-                        <Label fx:id="maxWaterRiseLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-                        <TextField fx:id="maxWaterRiseField" text="8" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                                    <Label fx:id="maxWaterRiseLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="maxWaterRiseField" text="8" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-                        <Label fx:id="materialLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-                        <ComboBox fx:id="materialBox" maxWidth="Infinity" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                                    <Label fx:id="materialLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                                    <ComboBox fx:id="materialBox" maxWidth="Infinity" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
-                        <Label fx:id="wallThicknessLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="7" GridPane.columnIndex="0"/>
-                        <TextField fx:id="wallThicknessField" text="0.9" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+                                    <Label fx:id="wallThicknessLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="wallThicknessField" text="0.9" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
 
-                        <Label fx:id="maxPressureLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="8" GridPane.columnIndex="0"/>
-                        <TextField fx:id="maxPressureField" text="2" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+                                    <Label fx:id="maxPressureLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="maxPressureField" text="2" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
 
-                        <Label fx:id="bendsLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="9" GridPane.columnIndex="0"/>
-                        <TextField fx:id="bendsField" text="7" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+                                    <Label fx:id="bendsLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="9" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="bendsField" text="7" GridPane.rowIndex="9" GridPane.columnIndex="1"/>
 
-                        <Label fx:id="bendRadiusLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="10" GridPane.columnIndex="0"/>
-                        <TextField fx:id="bendRadiusField" text="28" GridPane.rowIndex="10" GridPane.columnIndex="1"/>
-                    </GridPane>
+                                    <Label fx:id="bendRadiusLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="10" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="bendRadiusField" text="28" GridPane.rowIndex="10" GridPane.columnIndex="1"/>
+                                </GridPane>
+                            </VBox>
 
-                    <Separator/>
-                    <Label fx:id="optimizerTitleLabel" styleClass="section-title" text="Tube"/>
-                    <Label fx:id="optimizerHintLabel" styleClass="hint" wrapText="true" maxWidth="Infinity"/>
-                    <GridPane hgap="8" vgap="8" maxWidth="Infinity">
-                        <columnConstraints>
-                            <ColumnConstraints hgrow="ALWAYS" minWidth="140" prefWidth="170" fillWidth="true"/>
-                            <ColumnConstraints hgrow="ALWAYS" minWidth="70" prefWidth="90" fillWidth="true"/>
-                            <ColumnConstraints hgrow="ALWAYS" minWidth="70" prefWidth="90" fillWidth="true"/>
-                            <ColumnConstraints hgrow="NEVER" minWidth="70" prefWidth="80" halignment="CENTER"/>
-                        </columnConstraints>
+                            <VBox spacing="6" styleClass="card" minWidth="300" prefWidth="360" HBox.hgrow="ALWAYS">
+                                <Label fx:id="optimizerTitleLabel" styleClass="section-title" text="Tube"/>
+                                <Label fx:id="optimizerHintLabel" styleClass="hint" wrapText="true" maxWidth="Infinity"/>
+                                <GridPane hgap="6" vgap="4" maxWidth="Infinity">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" minWidth="100" prefWidth="130"/>
+                                        <ColumnConstraints hgrow="ALWAYS" minWidth="60" prefWidth="72"/>
+                                        <ColumnConstraints hgrow="ALWAYS" minWidth="60" prefWidth="72"/>
+                                        <ColumnConstraints hgrow="NEVER" minWidth="52" prefWidth="58" halignment="CENTER"/>
+                                    </columnConstraints>
 
-                        <Label fx:id="minHeaderLabel" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                        <Label fx:id="maxHeaderLabel" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
-                        <Label fx:id="searchHeaderLabel" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+                                    <Label fx:id="minHeaderLabel" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                    <Label fx:id="maxHeaderLabel" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                                    <Label fx:id="searchHeaderLabel" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
 
-                        <Label fx:id="innerDiameterLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                        <TextField fx:id="innerDiameterField" text="10.9" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                        <TextField fx:id="diameterMaxField" text="10.9" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
-                        <CheckBox fx:id="varyDiameterBox" selected="false" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+                                    <Label fx:id="innerDiameterLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="innerDiameterField" text="10.9" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                    <TextField fx:id="diameterMaxField" text="10.9" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                                    <CheckBox fx:id="varyDiameterBox" selected="false" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
 
-                        <Label fx:id="lengthLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                        <TextField fx:id="lengthField" text="3600" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                        <TextField fx:id="lengthMaxField" text="3600" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
-                        <CheckBox fx:id="varyLengthBox" selected="false" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+                                    <Label fx:id="lengthLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="lengthField" text="3600" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                    <TextField fx:id="lengthMaxField" text="3600" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+                                    <CheckBox fx:id="varyLengthBox" selected="false" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
 
-                        <Label fx:id="flowLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                        <TextField fx:id="flowField" text="10" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-                        <TextField fx:id="flowMaxField" text="30" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
-                        <CheckBox fx:id="varyFlowBox" selected="true" GridPane.rowIndex="3" GridPane.columnIndex="3"/>
+                                    <Label fx:id="flowLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="flowField" text="10" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                                    <TextField fx:id="flowMaxField" text="30" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+                                    <CheckBox fx:id="varyFlowBox" selected="true" GridPane.rowIndex="3" GridPane.columnIndex="3"/>
 
-                        <Label fx:id="iterationsLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
-                               GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                        <TextField fx:id="iterationsField" text="8" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-                    </GridPane>
+                                    <Label fx:id="iterationsLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                    <TextField fx:id="iterationsField" text="8" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                                </GridPane>
 
-                    <VBox spacing="8">
-                        <HBox spacing="8">
-                            <Button fx:id="calculateButton" defaultButton="true" onAction="#onCalculateButtonClick"
-                                    styleClass="primary" minWidth="140" text="Calculate"/>
-                            <Button fx:id="optimizeButton" onAction="#onOptimizeButtonClick" styleClass="secondary"
-                                    minWidth="180" text="Optimize"/>
+                                <HBox spacing="8">
+                                    <Button fx:id="calculateButton" defaultButton="true" onAction="#onCalculateButtonClick"
+                                            styleClass="primary" maxWidth="Infinity" minWidth="100" text="Calculate"
+                                            HBox.hgrow="ALWAYS"/>
+                                    <Button fx:id="optimizeButton" onAction="#onOptimizeButtonClick" styleClass="secondary"
+                                            maxWidth="Infinity" minWidth="100" text="Optimize" HBox.hgrow="ALWAYS"/>
+                                </HBox>
+                                <Label fx:id="statusLabel" styleClass="status" wrapText="true" maxWidth="Infinity"/>
+                            </VBox>
+
+                            <VBox spacing="6" styleClass="card" minWidth="300" prefWidth="380" HBox.hgrow="ALWAYS">
+                                <Label fx:id="resultsTitleLabel" styleClass="section-title" text="Results"/>
+                                <GridPane hgap="8" vgap="3" maxWidth="Infinity">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" minWidth="130" prefWidth="180"/>
+                                        <ColumnConstraints hgrow="NEVER" minWidth="90" prefWidth="120"/>
+                                    </columnConstraints>
+                                    <Label fx:id="maxPowerResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                    <Label fx:id="maxPowerResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                    <Label fx:id="apparentPowerResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                    <Label fx:id="apparentPowerResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                    <Label fx:id="chillerResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                    <Label fx:id="chillerResult" styleClass="value value-best" wrapText="true"
+                                           GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                    <Label fx:id="recommendedFlowResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                    <Label fx:id="recommendedFlowResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                                </GridPane>
+                                <Separator/>
+                                <Label fx:id="channelResultsTitleLabel" styleClass="section-title" text="Heat sink"/>
+                                <GridPane fx:id="resultGrid" hgap="8" vgap="3" maxWidth="Infinity">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" minWidth="130" prefWidth="180"/>
+                                        <ColumnConstraints hgrow="NEVER" minWidth="90" prefWidth="120"/>
+                                    </columnConstraints>
+
+                                    <Label fx:id="innerDiameterResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                    <Label fx:id="innerDiameterResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                    <Label fx:id="outerDiameterResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                    <Label fx:id="outerDiameterResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                    <Label fx:id="lengthResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                    <Label fx:id="lengthResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                    <Label fx:id="flowResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                    <Label fx:id="flowResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                                    <Label fx:id="velocityResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                    <Label fx:id="velocityResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                                    <Label fx:id="reynoldsResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                                    <Label fx:id="reynoldsResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                                    <Label fx:id="regimeResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                                    <Label fx:id="regimeResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                                    <Label fx:id="htcResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+                                    <Label fx:id="htcResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+                                    <Label fx:id="waterRiseResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+                                    <Label fx:id="waterRiseResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+                                    <Label fx:id="outletTempResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="9" GridPane.columnIndex="0"/>
+                                    <Label fx:id="outletTempResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+                                    <Label fx:id="wallTempResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="10" GridPane.columnIndex="0"/>
+                                    <Label fx:id="wallTempResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="10" GridPane.columnIndex="1"/>
+                                    <Label fx:id="efficiencyResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="11" GridPane.columnIndex="0"/>
+                                    <Label fx:id="efficiencyResult" styleClass="value value-best" wrapText="true"
+                                           GridPane.rowIndex="11" GridPane.columnIndex="1"/>
+                                    <Label fx:id="pressureResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="12" GridPane.columnIndex="0"/>
+                                    <Label fx:id="pressureResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="12" GridPane.columnIndex="1"/>
+                                    <Label fx:id="serpentineResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="13" GridPane.columnIndex="0"/>
+                                    <Label fx:id="serpentineResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="13" GridPane.columnIndex="1"/>
+                                    <Label fx:id="localLossResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="14" GridPane.columnIndex="0"/>
+                                    <Label fx:id="localLossResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="14" GridPane.columnIndex="1"/>
+                                    <Label fx:id="resistanceResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="15" GridPane.columnIndex="0"/>
+                                    <Label fx:id="resistanceResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="15" GridPane.columnIndex="1"/>
+                                    <Label fx:id="evaluatedResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="16" GridPane.columnIndex="0"/>
+                                    <Label fx:id="evaluatedResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="16" GridPane.columnIndex="1"/>
+                                    <Label fx:id="feasibleResultLabel" styleClass="field-label" wrapText="true" maxWidth="Infinity"
+                                           GridPane.rowIndex="17" GridPane.columnIndex="0"/>
+                                    <Label fx:id="feasibleResult" styleClass="value" wrapText="true"
+                                           GridPane.rowIndex="17" GridPane.columnIndex="1"/>
+                                </GridPane>
+
+                                <Label fx:id="recommendationTitleLabel" styleClass="section-title" text="Recommendation"/>
+                                <TextArea fx:id="recommendationArea" wrapText="true" editable="false" prefRowCount="3"
+                                          VBox.vgrow="ALWAYS"/>
+                            </VBox>
                         </HBox>
-                        <Label fx:id="statusLabel" styleClass="status" wrapText="true" maxWidth="Infinity"/>
-                    </VBox>
-                </VBox>
-
-                <VBox spacing="10" styleClass="card" minWidth="380" prefWidth="460" HBox.hgrow="ALWAYS">
-                    <Label fx:id="resultsTitleLabel" styleClass="section-title" text="Results"/>
-                    <GridPane hgap="12" vgap="6" maxWidth="Infinity">
-                        <columnConstraints>
-                            <ColumnConstraints hgrow="ALWAYS" minWidth="140" prefWidth="200" maxWidth="280"
-                                               fillWidth="true" halignment="LEFT"/>
-                            <ColumnConstraints hgrow="NEVER" minWidth="160" prefWidth="180" fillWidth="true"
-                                               halignment="LEFT"/>
-                        </columnConstraints>
-                        <Label fx:id="maxPowerResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                        <Label fx:id="maxPowerResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                        <Label fx:id="apparentPowerResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                        <Label fx:id="apparentPowerResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                        <Label fx:id="chillerResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                        <Label fx:id="chillerResult" styleClass="value value-best" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                        <Label fx:id="recommendedFlowResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                        <Label fx:id="recommendedFlowResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-                    </GridPane>
-                    <Separator/>
-                    <Label fx:id="channelResultsTitleLabel" styleClass="section-title" text="Heat sink"/>
-                    <GridPane fx:id="resultGrid" hgap="12" vgap="6" maxWidth="Infinity">
-                        <columnConstraints>
-                            <ColumnConstraints hgrow="ALWAYS" minWidth="140" prefWidth="200" maxWidth="280"
-                                               fillWidth="true" halignment="LEFT"/>
-                            <ColumnConstraints hgrow="NEVER" minWidth="160" prefWidth="180" fillWidth="true"
-                                               halignment="LEFT"/>
-                        </columnConstraints>
-
-                        <Label fx:id="innerDiameterResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                        <Label fx:id="innerDiameterResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="outerDiameterResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                        <Label fx:id="outerDiameterResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="lengthResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                        <Label fx:id="lengthResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="flowResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                        <Label fx:id="flowResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="velocityResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                        <Label fx:id="velocityResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-
-                        <Separator GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
-
-                        <Label fx:id="reynoldsResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-                        <Label fx:id="reynoldsResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="6" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="regimeResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="7" GridPane.columnIndex="0"/>
-                        <Label fx:id="regimeResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="7" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="htcResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="8" GridPane.columnIndex="0"/>
-                        <Label fx:id="htcResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="8" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="waterRiseResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="9" GridPane.columnIndex="0"/>
-                        <Label fx:id="waterRiseResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="9" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="outletTempResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="10" GridPane.columnIndex="0"/>
-                        <Label fx:id="outletTempResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="10" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="wallTempResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="11" GridPane.columnIndex="0"/>
-                        <Label fx:id="wallTempResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="11" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="efficiencyResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="12" GridPane.columnIndex="0"/>
-                        <Label fx:id="efficiencyResult" styleClass="value value-best" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="12" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="pressureResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="13" GridPane.columnIndex="0"/>
-                        <Label fx:id="pressureResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="13" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="serpentineResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="14" GridPane.columnIndex="0"/>
-                        <Label fx:id="serpentineResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="14" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="localLossResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="15" GridPane.columnIndex="0"/>
-                        <Label fx:id="localLossResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="15" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="resistanceResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="16" GridPane.columnIndex="0"/>
-                        <Label fx:id="resistanceResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="16" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="evaluatedResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="17" GridPane.columnIndex="0"/>
-                        <Label fx:id="evaluatedResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="17" GridPane.columnIndex="1"/>
-
-                        <Label fx:id="feasibleResultLabel" styleClass="field-label" wrapText="true" maxWidth="260"
-                               GridPane.rowIndex="18" GridPane.columnIndex="0"/>
-                        <Label fx:id="feasibleResult" styleClass="value" wrapText="true" minWidth="140"
-                               GridPane.rowIndex="18" GridPane.columnIndex="1"/>
-                    </GridPane>
-
-                    <Label fx:id="recommendationTitleLabel" styleClass="section-title" text="Recommendation"/>
-                    <TextArea fx:id="recommendationArea" wrapText="true" editable="false" prefRowCount="5"/>
-                </VBox>
-            </HBox>
-        </ScrollPane>
+                    </ScrollPane>
+                </content>
+            </Tab>
+            <Tab fx:id="chartsTab" closable="false" text="Charts">
+                <content>
+                    <fx:include fx:id="charts" source="charts-view.fxml"/>
+                </content>
+            </Tab>
+        </TabPane>
     </center>
 </BorderPane>

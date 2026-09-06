@@ -8,10 +8,10 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.TextFlow;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.StringConverter;
@@ -22,53 +22,27 @@ import java.util.function.ToDoubleFunction;
 public class ChartsController {
     @FunctionalInterface
     public interface InputSource {
-        Input read();
+        CoolingRequest read();
     }
 
-    public record Input(
-            CoolingRequest request,
-            double diameterMinM,
-            double diameterMaxM,
-            double lengthMinM,
-            double lengthMaxM,
-            double flowMinM3s,
-            double flowMaxM3s
-    ) {
-    }
-
-    @FXML private Label sweepLabel;
-    @FXML private ComboBox<DesignCurves.Axis> sweepBox;
-    @FXML private Button plotButton;
-    @FXML private Label chartsStatusLabel;
     @FXML private GridPane chartsGrid;
 
     private final CoolingCalculator calculator = new CoolingCalculator();
     private InputSource inputSource;
 
-    private LineChart<Number, Number> htcChart;
-    private LineChart<Number, Number> pressureChart;
-    private LineChart<Number, Number> wallChart;
-    private LineChart<Number, Number> riseChart;
-    private LineChart<Number, Number> efficiencyChart;
-    private LineChart<Number, Number> tradeoffChart;
+    private ChartPane htcChart;
+    private ChartPane pressureChart;
+    private ChartPane wallChart;
+    private ChartPane riseChart;
+    private ChartPane tradeoffChart;
 
     @FXML
     public void initialize() {
-        htcChart = addChart(0, 0);
-        pressureChart = addChart(1, 0);
+        pressureChart = addChart(0, 0);
+        htcChart = addChart(1, 0);
         wallChart = addChart(2, 0);
         riseChart = addChart(0, 1);
-        efficiencyChart = addChart(1, 1);
-        tradeoffChart = addChart(2, 1);
-        sweepBox.setConverter(axisConverter());
-        sweepBox.getItems().setAll(DesignCurves.Axis.values());
-        sweepBox.getSelectionModel().select(DesignCurves.Axis.FLOW);
-        sweepBox.getSelectionModel().selectedItemProperty().addListener((obs, oldAxis, axis) -> {
-            if (oldAxis != null && axis != null && inputSource != null) {
-                plotIfPossible();
-            }
-        });
-        applyI18n();
+        tradeoffChart = addChart(1, 1);
     }
 
     public void setInputSource(InputSource inputSource) {
@@ -76,12 +50,6 @@ public class ChartsController {
     }
 
     public void applyI18n() {
-        sweepLabel.setText(I18n.t("charts.sweep"));
-        plotButton.setText(I18n.t("charts.plot"));
-        DesignCurves.Axis selected = sweepBox.getValue();
-        sweepBox.setConverter(axisConverter());
-        sweepBox.getItems().setAll(DesignCurves.Axis.values());
-        sweepBox.setValue(selected != null ? selected : DesignCurves.Axis.FLOW);
         labelAxes();
     }
 
@@ -90,69 +58,72 @@ public class ChartsController {
             return;
         }
         try {
-            plot(inputSource.read());
-        } catch (IllegalArgumentException | NullPointerException ex) {
-            setStatus(ex.getMessage() != null ? ex.getMessage() : I18n.t("status.checkInputs"), true);
+            CoolingRequest request = inputSource.read();
+            if (request == null) {
+                return;
+            }
+            plot(request);
+        } catch (IllegalArgumentException | NullPointerException ignored) {
+            // charts stay empty until Calculate succeeds
         }
     }
 
-    @FXML
-    private void onPlot() {
-        plotIfPossible();
-    }
-
-    void plot(Input input) {
-        DesignCurves.Axis axis = sweepBox.getValue() != null ? sweepBox.getValue() : DesignCurves.Axis.FLOW;
-        double[] range = sweepRange(axis, input);
+    private void plot(CoolingRequest request) {
+        double[] range = pressureRange(request);
         List<DesignCurves.Sample> samples = DesignCurves.sweep(
-                calculator, input.request(), axis, range[0], range[1], DesignCurves.DEFAULT_POINTS);
+                calculator, request, range[0], range[1], DesignCurves.DEFAULT_POINTS);
         if (samples.isEmpty()) {
-            setStatus(I18n.t("charts.status.empty"), true);
             return;
         }
-        CoolingResult current = calculator.evaluate(
-                input.request(),
-                input.request().innerDiameterM(),
-                input.request().lengthM(),
-                input.request().volumeFlowM3s()
-        );
-        double currentX = switch (axis) {
-            case FLOW -> current.volumeFlowM3s() * 60_000.0;
-            case DIAMETER -> current.innerDiameterM() * 1000.0;
-            case LENGTH -> current.lengthM() * 1000.0;
-        };
+        CoolingResult current = calculator.evaluateAtPressure(request, request.chillerInletPressurePa());
+        double currentPressure = current.inletPressurePa() / 1e5;
+        double currentFlow = current.volumeFlowM3s() * 60_000.0;
 
         labelAxes();
-        fill(htcChart, samples, currentX, current.heatTransferCoeffWm2K(), CoolingResult::heatTransferCoeffWm2K);
-        fill(pressureChart, samples, currentX, current.pressureDropPa() / 1e5, r -> r.pressureDropPa() / 1e5);
-        fill(wallChart, samples, currentX, current.outerWallTempC(), CoolingResult::outerWallTempC);
-        fill(riseChart, samples, currentX, current.waterRiseK(), CoolingResult::waterRiseK);
-        fill(efficiencyChart, samples, currentX, current.coolingConductanceWPerK(), CoolingResult::coolingConductanceWPerK);
-        fillTradeoff(tradeoffChart, samples, current);
-        setStatus("", false);
+        fillXy(
+                pressureChart.chart,
+                samples,
+                currentFlow,
+                currentPressure,
+                r -> r.volumeFlowM3s() * 60_000.0,
+                r -> r.inletPressurePa() / 1e5
+        );
+        fill(htcChart.chart, samples, currentPressure, current.heatTransferCoeffWm2K(), CoolingResult::heatTransferCoeffWm2K);
+        fill(wallChart.chart, samples, currentPressure, current.outerWallTempC(), CoolingResult::outerWallTempC);
+        fill(riseChart.chart, samples, currentPressure, current.waterRiseK(), CoolingResult::waterRiseK);
+        fillXy(
+                tradeoffChart.chart,
+                samples,
+                currentFlow,
+                current.heatTransferCoeffWm2K(),
+                r -> r.volumeFlowM3s() * 60_000.0,
+                CoolingResult::heatTransferCoeffWm2K
+        );
     }
 
     private void labelAxes() {
         if (htcChart == null) {
             return;
         }
-        DesignCurves.Axis axis = sweepBox.getValue() != null ? sweepBox.getValue() : DesignCurves.Axis.FLOW;
-        String xLabel = I18n.t("axis." + axis.name());
-        setChart(htcChart, "chart.htc", xLabel, "axis.htc");
-        setChart(pressureChart, "chart.pressure", xLabel, "axis.pressure");
-        setChart(wallChart, "chart.wall", xLabel, "axis.wall");
-        setChart(riseChart, "chart.rise", xLabel, "axis.rise");
-        setChart(efficiencyChart, "chart.efficiency", xLabel, "axis.efficiency");
-        setChart(tradeoffChart, "chart.tradeoff", I18n.t("axis.pressure"), "axis.htc");
+        String pressure = I18n.t("axis.PRESSURE");
+        String flow = I18n.t("axis.FLOW");
+        setChart(pressureChart, "chart.flow", "chart.formula.flow", flow, "axis.PRESSURE");
+        setChart(htcChart, "chart.htc", "chart.formula.htc", pressure, "axis.htc");
+        setChart(wallChart, "chart.wall", "chart.formula.wall", pressure, "axis.wall");
+        setChart(riseChart, "chart.rise", "chart.formula.rise", pressure, "axis.rise");
+        setChart(tradeoffChart, "chart.tradeoff", "chart.formula.tradeoff", flow, "axis.htc");
     }
 
-    private static void setChart(LineChart<Number, Number> chart, String titleKey, String xLabel, String yKey) {
-        chart.setTitle(I18n.t(titleKey));
-        chart.getXAxis().setLabel(xLabel);
-        chart.getYAxis().setLabel(I18n.t(yKey));
+    private static void setChart(
+            ChartPane pane, String titleKey, String formulaKey, String xLabel, String yKey
+    ) {
+        pane.chart.setTitle(I18n.t(titleKey));
+        Formula.set(pane.formula, I18n.t(formulaKey));
+        pane.chart.getXAxis().setLabel(Formula.compact(xLabel));
+        pane.chart.getYAxis().setLabel(Formula.compact(I18n.t(yKey)));
     }
 
-    private LineChart<Number, Number> addChart(int column, int row) {
+    private ChartPane addChart(int column, int row) {
         NumberAxis xAxis = numberedAxis();
         NumberAxis yAxis = numberedAxis();
         LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
@@ -165,10 +136,20 @@ public class ChartsController {
         chart.setPrefHeight(220);
         chart.setMaxHeight(Double.MAX_VALUE);
         chart.getStyleClass().add("design-chart");
-        GridPane.setHgrow(chart, javafx.scene.layout.Priority.ALWAYS);
-        GridPane.setVgrow(chart, javafx.scene.layout.Priority.ALWAYS);
-        chartsGrid.add(chart, column, row);
-        return chart;
+
+        TextFlow formula = Formula.flow("");
+        formula.setMaxWidth(Double.MAX_VALUE);
+
+        VBox box = new VBox(4, formula, chart);
+        box.getStyleClass().add("chart-card");
+        VBox.setVgrow(chart, Priority.ALWAYS);
+        GridPane.setHgrow(box, Priority.ALWAYS);
+        GridPane.setVgrow(box, Priority.ALWAYS);
+        chartsGrid.add(box, column, row);
+        return new ChartPane(chart, formula);
+    }
+
+    private record ChartPane(LineChart<Number, Number> chart, TextFlow formula) {
     }
 
     private static NumberAxis numberedAxis() {
@@ -212,27 +193,26 @@ public class ChartsController {
             double currentY,
             ToDoubleFunction<CoolingResult> yFn
     ) {
-        XYChart.Series<Number, Number> curve = new XYChart.Series<>();
-        for (DesignCurves.Sample sample : samples) {
-            curve.getData().add(new XYChart.Data<>(sample.x(), yFn.applyAsDouble(sample.result())));
-        }
-        chart.getData().setAll(curve, mark(currentX, currentY));
+        fillXy(chart, samples, currentX, currentY, r -> r.inletPressurePa() / 1e5, yFn);
     }
 
-    private static void fillTradeoff(
+    private static void fillXy(
             LineChart<Number, Number> chart,
             List<DesignCurves.Sample> samples,
-            CoolingResult current
+            double currentX,
+            double currentY,
+            ToDoubleFunction<CoolingResult> xFn,
+            ToDoubleFunction<CoolingResult> yFn
     ) {
         XYChart.Series<Number, Number> curve = new XYChart.Series<>();
         for (DesignCurves.Sample sample : samples) {
             curve.getData().add(new XYChart.Data<>(
-                    sample.result().pressureDropPa() / 1e5,
-                    sample.result().heatTransferCoeffWm2K()
+                    xFn.applyAsDouble(sample.result()),
+                    yFn.applyAsDouble(sample.result())
             ));
         }
         curve.getData().sort((a, b) -> Double.compare(a.getXValue().doubleValue(), b.getXValue().doubleValue()));
-        chart.getData().setAll(curve, mark(current.pressureDropPa() / 1e5, current.heatTransferCoeffWm2K()));
+        chart.getData().setAll(curve, mark(currentX, currentY));
     }
 
     private static XYChart.Series<Number, Number> mark(double x, double y) {
@@ -246,57 +226,11 @@ public class ChartsController {
         return series;
     }
 
-    private static double[] sweepRange(DesignCurves.Axis axis, Input input) {
-        double min;
-        double max;
-        double collapseLow;
-        double collapseHigh;
-        switch (axis) {
-            case FLOW -> {
-                min = input.flowMinM3s();
-                max = input.flowMaxM3s();
-                collapseLow = 0.5;
-                collapseHigh = 2.0;
-            }
-            case DIAMETER -> {
-                min = input.diameterMinM();
-                max = input.diameterMaxM();
-                collapseLow = 0.7;
-                collapseHigh = 1.3;
-            }
-            case LENGTH -> {
-                min = input.lengthMinM();
-                max = input.lengthMaxM();
-                collapseLow = 0.6;
-                collapseHigh = 1.5;
-            }
-            default -> throw new IllegalStateException(axis.name());
-        }
-        double lo = Math.min(min, max);
-        double hi = Math.max(min, max);
-        if (hi <= lo * 1.02) {
-            return new double[]{lo * collapseLow, hi * collapseHigh};
-        }
+    private static double[] pressureRange(CoolingRequest request) {
+        double p = request.chillerInletPressurePa();
+        double lo = Math.max(0.5e5, p * 0.5);
+        double hi = Math.max(p * 1.6, 5e5);
         return new double[]{lo, hi};
     }
 
-    private void setStatus(String message, boolean error) {
-        chartsStatusLabel.setText(message);
-        chartsStatusLabel.getStyleClass().removeAll("status-ok", "status-error");
-        chartsStatusLabel.getStyleClass().add(error ? "status-error" : "status-ok");
-    }
-
-    private static StringConverter<DesignCurves.Axis> axisConverter() {
-        return new StringConverter<>() {
-            @Override
-            public String toString(DesignCurves.Axis axis) {
-                return axis == null ? "" : I18n.t("charts.sweep." + axis.name());
-            }
-
-            @Override
-            public DesignCurves.Axis fromString(String string) {
-                return null;
-            }
-        };
-    }
 }

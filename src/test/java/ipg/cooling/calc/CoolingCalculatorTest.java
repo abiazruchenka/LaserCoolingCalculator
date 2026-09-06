@@ -21,7 +21,7 @@ class CoolingCalculatorTest {
 
     @Test
     void temperatureRiseMatchesEnergyBalance() {
-        CoolingRequest request = sampleRequest(0.008, 0.4, 1.5e-5);
+        CoolingRequest request = sampleRequest(0.008, 0.4);
         CoolingResult result = calculator.evaluate(request, 0.008, 0.4, 1.5e-5);
         WaterProperties water = WaterProperties.atCelsius(request.inletTempC() + result.waterRiseK() / 2.0);
         double expectedRise = request.heatLoadW()
@@ -31,7 +31,7 @@ class CoolingCalculatorTest {
 
     @Test
     void higherFlowLowersWaterTemperatureRise() {
-        CoolingRequest request = sampleRequest(0.008, 0.4, null);
+        CoolingRequest request = sampleRequest(0.008, 0.4);
         CoolingResult slow = calculator.evaluate(request, 0.008, 0.4, 1.0e-5);
         CoolingResult fast = calculator.evaluate(request, 0.008, 0.4, 2.0e-5);
         assertTrue(fast.waterRiseK() < slow.waterRiseK());
@@ -40,10 +40,20 @@ class CoolingCalculatorTest {
 
     @Test
     void smallerDiameterRaisesPressureDropAtFixedFlow() {
-        CoolingRequest request = sampleRequest(0.006, 0.4, 1.5e-5);
+        CoolingRequest request = sampleRequest(0.006, 0.4);
         CoolingResult narrow = calculator.evaluate(request, 0.006, 0.4, 1.5e-5);
         CoolingResult wide = calculator.evaluate(request, 0.012, 0.4, 1.5e-5);
         assertTrue(narrow.pressureDropPa() > wide.pressureDropPa());
+    }
+
+    @Test
+    void smallerDiameterLowersFlowAtFixedChillerPressure() {
+        CoolingRequest request = sampleRequest(0.006, 0.4);
+        CoolingResult narrow = calculator.evaluateAtPressure(request, 0.006, 0.4, 2e5);
+        CoolingResult wide = calculator.evaluateAtPressure(request, 0.012, 0.4, 2e5);
+        assertTrue(narrow.volumeFlowM3s() < wide.volumeFlowM3s());
+        assertEquals(2e5, narrow.inletPressurePa(), 5e3);
+        assertEquals(2e5, wide.inletPressurePa(), 5e3);
     }
 
     @Test
@@ -53,126 +63,30 @@ class CoolingCalculatorTest {
     }
 
     @Test
-    void autoDesignFor500WStaysWithinLimits() {
-        CoolingRequest request = new CoolingRequest(
-                500, 0.5, 0.93, 20, 45, 8, TubeMaterial.COPPER, 0.001,
-                null, null, null, 2e5, 0, 0.04
-        );
+    void calculateUsesPlateGeometryAndChillerPressure() {
+        CoolingRequest request = sampleRequest(0.008, 0.4);
         CoolingResult result = calculator.calculate(request);
-        assertTrue(result.wallLimitOk(), result.recommendation());
-        assertTrue(result.pressureLimitOk(), result.recommendation());
-        assertTrue(result.noBoiling(), result.recommendation());
-        assertTrue(result.innerDiameterM() > 0);
-        assertTrue(result.lengthM() > 0);
+        assertEquals(0.008, result.innerDiameterM(), 1e-9);
+        assertEquals(0.4, result.lengthM(), 1e-9);
+        assertEquals(2e5, result.inletPressurePa(), 5e3);
         assertTrue(result.volumeFlowM3s() > 0);
     }
 
     @Test
     void rejectsNonPositiveHeatLoad() {
         CoolingRequest request = new CoolingRequest(
-                0, 0.5, 0.93, 20, 45, 8, TubeMaterial.COPPER, 0.001,
-                0.008, 0.4, 1.5e-5, 2e5, 0, 0.04
+                0, 0.5, 0.93, 20, 45, 8.0, TubeMaterial.COPPER, 0.001,
+                0.008, 0.4, 0, 2e5, 0, 0.04, null
         );
         assertThrows(IllegalArgumentException.class, () -> calculator.calculate(request));
     }
 
     @Test
-    void optimizerWithOneIterationReturnsStartPoint() {
-        CoolingRequest request = sampleRequest(0.008, 0.4, 1.5e-5);
-        OptimizerSettings settings = new OptimizerSettings(
-                0.008, 0.012, false,
-                0.4, 0.6, false,
-                1.5e-5, 3e-5, false,
-                8
-        );
-        OptimizerOutcome outcome = calculator.optimize(request, settings);
-        assertEquals(1, outcome.evaluated());
-        assertEquals(0.008, outcome.best().innerDiameterM(), 1e-9);
-        assertEquals(0.4, outcome.best().lengthM(), 1e-9);
-        assertEquals(1.5e-5, outcome.best().volumeFlowM3s(), 1e-12);
-    }
-
-    @Test
-    void optimizerGridSizeIsProductOfIterationCounts() {
-        CoolingRequest request = sampleRequest(0.006, 0.3, 1.2e-5);
-        OptimizerSettings settings = new OptimizerSettings(
-                0.006, 0.009, true,
-                0.3, 0.45, true,
-                1.2e-5, 1.8e-5, true,
-                4
-        );
-        OptimizerOutcome outcome = calculator.optimize(request, settings);
-        assertEquals(64, outcome.evaluated());
-        assertTrue(outcome.feasible() >= 0);
-        assertTrue(outcome.best().innerDiameterM() >= 0.006);
-        assertTrue(outcome.best().lengthM() >= 0.3);
-    }
-
-    @Test
-    void moreIterationsCanFindLowerOrEqualWallTemperature() {
-        CoolingRequest request = new CoolingRequest(
-                500, 0.5, 0.93, 20, 45, 8, TubeMaterial.COPPER, 0.001,
-                null, null, null, 2e5, 0, 0.04
-        );
-        OptimizerSettings coarse = new OptimizerSettings(
-                0.004, 0.010, true,
-                0.2, 0.5, true,
-                8e-6, 2e-5, true,
-                2
-        );
-        OptimizerSettings fine = new OptimizerSettings(
-                0.004, 0.010, true,
-                0.2, 0.5, true,
-                8e-6, 2e-5, true,
-                4
-        );
-        OptimizerOutcome coarseOutcome = calculator.optimize(request, coarse);
-        OptimizerOutcome fineOutcome = calculator.optimize(request, fine);
-        assertEquals(8, coarseOutcome.evaluated());
-        assertEquals(64, fineOutcome.evaluated());
-        assertTrue(fineOutcome.feasible() >= coarseOutcome.feasible());
-    }
-
-    @Test
-    void optimizerSelectsHighestCoolingEfficiencyAmongFeasible() {
-        CoolingRequest request = sampleRequest(0.008, 0.4, 1.0e-5);
-        CoolingResult lowFlow = calculator.evaluate(request, 0.008, 0.4, 1.0e-5);
-        CoolingResult highFlow = calculator.evaluate(request, 0.008, 0.4, 2.0e-5);
-        assertTrue(highFlow.coolingConductanceWPerK() > lowFlow.coolingConductanceWPerK());
-
-        OptimizerSettings settings = new OptimizerSettings(
-                0.008, 0.008, false,
-                0.4, 0.4, false,
-                1.0e-5, 2.0e-5, true,
-                3
-        );
-        CoolingResult best = calculator.optimize(request, settings).best();
-        assertEquals(2.0e-5, best.volumeFlowM3s(), 1e-12);
-        assertEquals(highFlow.coolingConductanceWPerK(), best.coolingConductanceWPerK(), 1e-6);
-    }
-
-    @Test
-    void optimizerDoesNotClampLengthToFiveMeters() {
-        CoolingRequest request = sampleRequest(0.016, 12.0, 8.3e-5);
-        OptimizerSettings settings = new OptimizerSettings(
-                0.016, 0.016, false,
-                12.0, 16.0, true,
-                8.3e-5, 8.3e-5, false,
-                5
-        );
-        OptimizerOutcome outcome = calculator.optimize(request, settings);
-        assertEquals(5, outcome.evaluated());
-        assertTrue(outcome.best().lengthM() >= 12.0 - 1e-9, outcome.best().recommendation());
-        assertTrue(outcome.best().lengthM() <= 16.0 + 1e-9);
-        assertTrue(outcome.best().coolingConductanceWPerK() > 0);
-    }
-
-    @Test
     void serpentineUBendsRaisePressureDropAtFixedFlow() {
-        CoolingRequest straight = sampleRequest(0.0109, 3.6, 8.3e-5);
+        CoolingRequest straight = sampleRequest(0.0109, 3.6);
         CoolingRequest plate = new CoolingRequest(
-                500, 0.5, 0.93, 20, 45, 8, TubeMaterial.STAINLESS_STEEL, 0.0009,
-                0.0109, 3.6, 8.3e-5, 2e5, 7, 0.028
+                500, 0.5, 0.93, 20, 45, 8.0, TubeMaterial.STAINLESS_STEEL, 0.0009,
+                0.0109, 3.6, 0, 2e5, 7, 0.028, null
         );
         CoolingResult straightResult = calculator.evaluate(straight, 0.0109, 3.6, 8.3e-5);
         CoolingResult plateResult = calculator.evaluate(plate, 0.0109, 3.6, 8.3e-5);
@@ -191,8 +105,8 @@ class CoolingCalculatorTest {
     @Test
     void ml770At10LminMatchesSpecVelocity() {
         CoolingRequest request = new CoolingRequest(
-                8000, 0.38, 0.93, 20, 45, 8, TubeMaterial.STAINLESS_STEEL, 0.0009,
-                0.0109, 3.6, 10.0 / 60_000.0, 2e5, 7, 0.028
+                8000, 0.38, 0.93, 20, 45, 8.0, TubeMaterial.STAINLESS_STEEL, 0.0009,
+                0.0109, 3.6, 0, 2e5, 7, 0.028, null
         );
         CoolingResult result = calculator.evaluate(request, 0.0109, 3.6, 10.0 / 60_000.0);
         assertEquals(1.79, result.velocityMps(), 0.02);
@@ -204,28 +118,45 @@ class CoolingCalculatorTest {
     }
 
     @Test
-    void designCurvesFlowSweepRaisesHtcAndPressureDrop() {
+    void designCurvesPressureSweepRaisesFlowAndLowersWaterRise() {
         CoolingRequest request = new CoolingRequest(
-                8000, 0.38, 0.93, 20, 45, 8, TubeMaterial.STAINLESS_STEEL, 0.0009,
-                0.0109, 3.6, 10.0 / 60_000.0, 2e5, 7, 0.028
+                8000, 0.38, 0.93, 20, 45, 8.0, TubeMaterial.STAINLESS_STEEL, 0.0009,
+                0.0109, 3.6, 0, 2.5e5, 7, 0.028, null
         );
-        var samples = DesignCurves.sweep(
-                calculator, request, DesignCurves.Axis.FLOW,
-                10.0 / 60_000.0, 30.0 / 60_000.0, 9
-        );
+        var samples = DesignCurves.sweep(calculator, request, 2.5e5, 5.0e5, 9);
         assertEquals(9, samples.size());
-        CoolingResult slow = samples.getFirst().result();
-        CoolingResult fast = samples.getLast().result();
-        assertTrue(fast.heatTransferCoeffWm2K() > slow.heatTransferCoeffWm2K());
-        assertTrue(fast.pressureDropPa() > slow.pressureDropPa());
-        assertTrue(fast.waterRiseK() < slow.waterRiseK());
-        assertTrue(fast.outerWallTempC() < slow.outerWallTempC());
+        CoolingResult low = samples.getFirst().result();
+        CoolingResult high = samples.getLast().result();
+        assertTrue(high.volumeFlowM3s() > low.volumeFlowM3s());
+        assertTrue(high.heatTransferCoeffWm2K() > low.heatTransferCoeffWm2K());
+        assertTrue(high.waterRiseK() < low.waterRiseK());
+        assertTrue(high.outerWallTempC() < low.outerWallTempC());
     }
 
-    private static CoolingRequest sampleRequest(double diameterM, double lengthM, Double flowM3s) {
+    @Test
+    void plateSerpentineFitsAndAddsAluminumResistance() {
+        CoolingPlate plate = CoolingPlate.typicalCastPlate();
+        SerpentineLayout layout = SerpentineLayout.tryCreate(
+                plate, TubeOrientation.ALONG_WIDTH, 8, 0.028, 0.0127);
+        assertTrue(layout != null);
+        assertEquals(7, layout.uBends());
+        assertTrue(layout.developedLengthM() > 3.0 && layout.developedLengthM() < 5.0);
+        CoolingRequest request = new CoolingRequest(
+                8000, 0.38, 0.93, 20, 45, 8.0, TubeMaterial.STAINLESS_STEEL, 0.0009,
+                0.0109, layout.developedLengthM(), 0, 2.5e5, 7, 0.028, plate
+        );
+        CoolingResult withPlate = calculator.evaluateAtPressure(request, 0.0109, layout.developedLengthM(), 2.5e5);
+        CoolingResult tubeOnly = calculator.evaluateAtPressure(
+                request.withPlate(null), 0.0109, layout.developedLengthM(), 2.5e5);
+        assertTrue(withPlate.plateTempC() > withPlate.outerWallTempC());
+        assertTrue(withPlate.timeConstantS() > 0);
+        assertTrue(withPlate.plateTempC() > tubeOnly.outerWallTempC() - 1e-6);
+    }
+
+    private static CoolingRequest sampleRequest(double diameterM, double lengthM) {
         return new CoolingRequest(
-                500, 0.5, 0.93, 20, 45, 8, TubeMaterial.COPPER, 0.001,
-                diameterM, lengthM, flowM3s, 2e5, 0, 0.04
+                500, 0.5, 0.93, 20, 45, 8.0, TubeMaterial.COPPER, 0.001,
+                diameterM, lengthM, 0, 2e5, 0, 0.04, null
         );
     }
 }

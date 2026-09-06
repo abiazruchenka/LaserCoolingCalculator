@@ -3,24 +3,31 @@ package ipg.cooling;
 import ipg.cooling.calc.CoolingCalculator;
 import ipg.cooling.calc.CoolingRequest;
 import ipg.cooling.calc.CoolingResult;
-import ipg.cooling.calc.OptimizerOutcome;
-import ipg.cooling.calc.OptimizerSettings;
-import ipg.cooling.calc.TubeMaterial;
+import ipg.cooling.catalog.PlateCatalog;
+import ipg.cooling.catalog.PlateDefinition;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.StringConverter;
@@ -32,15 +39,23 @@ public class ResultController {
     @FXML private Label titleLabel;
     @FXML private Label subtitleLabel;
     @FXML private MenuButton languageButton;
-    @FXML private Menu helpMenu;
+    @FXML private MenuButton helpButton;
     @FXML private MenuItem helpTopicMenuItem;
     @FXML private MenuItem aboutMenuItem;
+    @FXML private Button calcTabButton;
+    @FXML private Button chartsTabButton;
+    @FXML private Button diagramTabButton;
+    @FXML private GridPane symbolsPane;
     @FXML private TabPane mainTabs;
     @FXML private Tab calcTab;
     @FXML private Tab chartsTab;
+    @FXML private Tab diagramTab;
+    @FXML private ScrollPane diagramScroll;
+    @FXML private DiagramView diagramView;
+    @FXML private Label diagramTitleLabel;
+    @FXML private Label diagramHintLabel;
     @FXML private ChartsController chartsController;
     @FXML private Label inputsTitleLabel;
-    @FXML private Label autoHintLabel;
     @FXML private Label laserPowerLabel;
     @FXML private TextField laserPowerField;
     @FXML private Label efficiencyLabel;
@@ -53,37 +68,17 @@ public class ResultController {
     @FXML private TextField maxWallTempField;
     @FXML private Label maxWaterRiseLabel;
     @FXML private TextField maxWaterRiseField;
-    @FXML private Label materialLabel;
-    @FXML private ComboBox<TubeMaterial> materialBox;
-    @FXML private Label wallThicknessLabel;
-    @FXML private TextField wallThicknessField;
-    @FXML private Label maxPressureLabel;
-    @FXML private TextField maxPressureField;
-    @FXML private Label bendsLabel;
-    @FXML private TextField bendsField;
-    @FXML private Label bendRadiusLabel;
-    @FXML private TextField bendRadiusField;
-    @FXML private Label optimizerTitleLabel;
-    @FXML private Label optimizerHintLabel;
-    @FXML private Label minHeaderLabel;
-    @FXML private Label maxHeaderLabel;
-    @FXML private Label searchHeaderLabel;
-    @FXML private Label innerDiameterLabel;
-    @FXML private TextField innerDiameterField;
-    @FXML private TextField diameterMaxField;
-    @FXML private CheckBox varyDiameterBox;
-    @FXML private Label lengthLabel;
-    @FXML private TextField lengthField;
-    @FXML private TextField lengthMaxField;
-    @FXML private CheckBox varyLengthBox;
-    @FXML private Label flowLabel;
-    @FXML private TextField flowField;
-    @FXML private TextField flowMaxField;
-    @FXML private CheckBox varyFlowBox;
-    @FXML private Label iterationsLabel;
-    @FXML private TextField iterationsField;
+    @FXML private Label plateTitleLabel;
+    @FXML private Label plateSelectLabel;
+    @FXML private ComboBox<PlateDefinition> plateBox;
+    @FXML private TextArea plateSummaryArea;
+    @FXML private Label circuitLabel;
+    @FXML private ComboBox<CircuitLoop> circuitBox;
+    @FXML private Label outletPressureLabel;
+    @FXML private TextField outletPressureField;
+    @FXML private Label chillerPressureLabel;
+    @FXML private TextField chillerPressureField;
     @FXML private Button calculateButton;
-    @FXML private Button optimizeButton;
     @FXML private Label statusLabel;
     @FXML private Label resultsTitleLabel;
     @FXML private Label maxPowerResultLabel;
@@ -95,10 +90,6 @@ public class ResultController {
     @FXML private Label recommendedFlowResultLabel;
     @FXML private Label recommendedFlowResult;
     @FXML private Label channelResultsTitleLabel;
-    @FXML private Label innerDiameterResultLabel;
-    @FXML private Label innerDiameterResult;
-    @FXML private Label outerDiameterResultLabel;
-    @FXML private Label outerDiameterResult;
     @FXML private Label lengthResultLabel;
     @FXML private Label lengthResult;
     @FXML private Label flowResultLabel;
@@ -117,47 +108,104 @@ public class ResultController {
     @FXML private Label outletTempResult;
     @FXML private Label wallTempResultLabel;
     @FXML private Label wallTempResult;
-    @FXML private Label efficiencyResultLabel;
-    @FXML private Label efficiencyResult;
+    @FXML private Label plateTempResultLabel;
+    @FXML private Label plateTempResult;
+    @FXML private Label timeConstantResultLabel;
+    @FXML private Label timeConstantResult;
     @FXML private Label pressureResultLabel;
     @FXML private Label pressureResult;
-    @FXML private Label serpentineResultLabel;
-    @FXML private Label serpentineResult;
     @FXML private Label localLossResultLabel;
     @FXML private Label localLossResult;
-    @FXML private Label resistanceResultLabel;
-    @FXML private Label resistanceResult;
-    @FXML private Label evaluatedResultLabel;
-    @FXML private Label evaluatedResult;
-    @FXML private Label feasibleResultLabel;
-    @FXML private Label feasibleResult;
-    @FXML private Label recommendationTitleLabel;
-    @FXML private TextArea recommendationArea;
 
     private final CoolingCalculator calculator = new CoolingCalculator();
+    private PlateCatalog plateCatalog;
     private CoolingRequest lastRequest;
-    private OptimizerSettings lastOptimizerSettings;
 
     @FXML
     public void initialize() {
-        materialBox.setConverter(materialConverter());
-        materialBox.getItems().setAll(TubeMaterial.values());
-        materialBox.getSelectionModel().select(TubeMaterial.STAINLESS_STEEL);
+        circuitBox.setConverter(circuitConverter());
+        circuitBox.getItems().setAll(CircuitLoop.values());
+        circuitBox.getSelectionModel().select(CircuitLoop.CLOSED_CHILLER);
+        circuitBox.valueProperty().addListener((obs, oldLoop, loop) -> updateCircuitFields());
+        try {
+            loadPlateCatalog();
+        } catch (RuntimeException ex) {
+            setStatus(ex.getMessage() != null ? ex.getMessage() : I18n.t("error.catalog"), true);
+        }
+        plateBox.valueProperty().addListener((obs, oldPlate, plate) -> updatePlateSummary(plate));
         for (AppLanguage language : AppLanguage.values()) {
             MenuItem item = new MenuItem(language.displayName());
             item.setOnAction(event -> switchLanguage(language));
             languageButton.getItems().add(item);
         }
-        applyI18n();
         if (chartsController != null) {
-            chartsController.setInputSource(this::readChartInput);
-            mainTabs.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, tab) -> {
-                if (tab == chartsTab) {
-                    chartsController.plotIfPossible();
-                }
-            });
+            chartsController.setInputSource(this::lastCalculatedRequest);
         }
-        Platform.runLater(this::updateWindowTitle);
+        mainTabs.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, tab) -> {
+            updateTabSwitcher();
+            if (tab == chartsTab && chartsController != null) {
+                chartsController.plotIfPossible();
+            }
+            if (tab == diagramTab) {
+                Platform.runLater(this::fitDiagram);
+            }
+        });
+        if (diagramScroll != null && diagramView != null) {
+            diagramScroll.viewportBoundsProperty().addListener((obs, oldBounds, bounds) ->
+                    Platform.runLater(this::fitDiagram));
+        }
+        applyI18n();
+        Platform.runLater(() -> {
+            hideNativeTabHeader();
+            updateWindowTitle();
+        });
+    }
+
+    @FXML
+    private void showCalculatorTab() {
+        mainTabs.getSelectionModel().select(calcTab);
+        updateTabSwitcher();
+    }
+
+    @FXML
+    private void showChartsTab() {
+        mainTabs.getSelectionModel().select(chartsTab);
+        updateTabSwitcher();
+    }
+
+    @FXML
+    private void showDiagramTab() {
+        mainTabs.getSelectionModel().select(diagramTab);
+        updateTabSwitcher();
+        Platform.runLater(this::fitDiagram);
+    }
+
+    private void fitDiagram() {
+        if (diagramScroll == null || diagramView == null) {
+            return;
+        }
+        var bounds = diagramScroll.getViewportBounds();
+        if (bounds.getWidth() <= 0 || bounds.getHeight() <= 0) {
+            return;
+        }
+        double used = 28;
+        if (diagramScroll.getContent() instanceof VBox box) {
+            used = box.getPadding().getTop() + box.getPadding().getBottom();
+            int others = 0;
+            for (var child : box.getChildren()) {
+                if (child == diagramView) {
+                    continue;
+                }
+                used += Math.max(child.getLayoutBounds().getHeight(), child.prefHeight(bounds.getWidth()));
+                others++;
+            }
+            used += box.getSpacing() * others;
+        }
+        double width = Math.max(1, bounds.getWidth() - 4);
+        double height = Math.max(220, bounds.getHeight() - used);
+        diagramView.setMinSize(0, 0);
+        diagramView.setPrefSize(width, height);
+        diagramView.setMaxSize(width, height);
     }
 
     @FXML
@@ -168,51 +216,53 @@ public class ResultController {
 
     @FXML
     private void onAbout() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, I18n.t("about.body", AppVersion.display(), AppVersion.author()), ButtonType.OK);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.OK);
         alert.setTitle(I18n.t("about.title"));
         alert.setHeaderText(I18n.t("about.header"));
         alert.initOwner(titleLabel.getScene() != null ? titleLabel.getScene().getWindow() : null);
         alert.setResizable(true);
         alert.getDialogPane().setMinWidth(560);
         alert.getDialogPane().setPrefWidth(560);
-        alert.getDialogPane().setMinHeight(320);
-        alert.getDialogPane().setPrefHeight(360);
-        if (alert.getDialogPane().lookup(".content.label") instanceof Label content) {
-            content.setWrapText(true);
-            content.setPrefWidth(500);
-            content.setMinHeight(160);
+        if (titleLabel.getScene() != null) {
+            alert.getDialogPane().getStylesheets().addAll(titleLabel.getScene().getStylesheets());
         }
+        alert.getDialogPane().setContent(aboutBody(I18n.t(
+                "about.body", AppVersion.display(), AppVersion.author())));
+        alert.setOnShown(event -> alert.getDialogPane().getScene().getWindow().sizeToScene());
         alert.showAndWait();
+    }
+
+    private static VBox aboutBody(String body) {
+        VBox box = new VBox(10);
+        box.setPadding(new Insets(8, 4, 12, 4));
+        box.setMaxWidth(508);
+        for (String line : body.split("\n", -1)) {
+            if (line.isEmpty()) {
+                Label spacer = new Label();
+                spacer.setMinHeight(6);
+                box.getChildren().add(spacer);
+                continue;
+            }
+            TextFlow flow = Formula.flow(line);
+            flow.getStyleClass().add("about-body");
+            flow.setMaxWidth(500);
+            box.getChildren().add(flow);
+        }
+        return box;
     }
 
     @FXML
     protected void onCalculateButtonClick() {
         try {
             lastRequest = readRequest();
-            lastOptimizerSettings = null;
             CoolingResult result = calculator.calculate(lastRequest);
             showResult(result);
-            evaluatedResult.setText("");
-            feasibleResult.setText("");
+            if (chartsController != null) {
+                chartsController.plotIfPossible();
+            }
             setStatus(I18n.t("status.done"), false);
         } catch (IllegalArgumentException | NullPointerException ex) {
             lastRequest = null;
-            lastOptimizerSettings = null;
-            setStatus(ex.getMessage() != null ? ex.getMessage() : I18n.t("status.checkInputs"), true);
-        }
-    }
-
-    @FXML
-    protected void onOptimizeButtonClick() {
-        try {
-            lastRequest = readRequest();
-            lastOptimizerSettings = readOptimizerSettings();
-            OptimizerOutcome outcome = calculator.optimize(lastRequest, lastOptimizerSettings);
-            showOutcome(outcome);
-            setStatus(I18n.t("status.optimized", outcome.evaluated(), outcome.feasible()), false);
-        } catch (IllegalArgumentException | NullPointerException ex) {
-            lastRequest = null;
-            lastOptimizerSettings = null;
             setStatus(ex.getMessage() != null ? ex.getMessage() : I18n.t("status.checkInputs"), true);
         }
     }
@@ -220,26 +270,35 @@ public class ResultController {
     private void switchLanguage(AppLanguage language) {
         I18n.setLanguage(language);
         applyI18n();
-        if (lastOptimizerSettings != null && lastRequest != null) {
-            OptimizerOutcome outcome = calculator.optimize(lastRequest, lastOptimizerSettings);
-            showOutcome(outcome);
-            setStatus(I18n.t("status.optimized", outcome.evaluated(), outcome.feasible()), false);
-        } else if (lastRequest != null) {
+        if (lastRequest != null) {
             showResult(calculator.calculate(lastRequest));
-            evaluatedResult.setText("");
-            feasibleResult.setText("");
+            if (chartsController != null) {
+                chartsController.plotIfPossible();
+            }
             setStatus(I18n.t("status.done"), false);
         }
     }
 
     private void applyI18n() {
         languageButton.setText(I18n.language().code());
-        helpMenu.setText(I18n.t("menu.help"));
+        helpButton.setText(I18n.t("menu.help"));
         helpTopicMenuItem.setText(I18n.t("menu.methodology"));
         aboutMenuItem.setText(I18n.t("menu.about"));
         HelpWindow.applyI18n();
         calcTab.setText(I18n.t("tab.calculator"));
         chartsTab.setText(I18n.t("tab.charts"));
+        diagramTab.setText(I18n.t("tab.diagram"));
+        calcTabButton.setText(I18n.t("tab.calculator"));
+        chartsTabButton.setText(I18n.t("tab.charts"));
+        diagramTabButton.setText(I18n.t("tab.diagram"));
+        diagramTitleLabel.setText(I18n.t("diagram.title"));
+        diagramHintLabel.setText(I18n.t("diagram.hint"));
+        if (diagramView != null) {
+            diagramView.redraw();
+            Platform.runLater(this::fitDiagram);
+        }
+        refreshSymbols();
+        updateTabSwitcher();
         if (chartsController != null) {
             chartsController.applyI18n();
             if (mainTabs.getSelectionModel().getSelectedItem() == chartsTab) {
@@ -249,63 +308,223 @@ public class ResultController {
         titleLabel.setText(I18n.t("title"));
         subtitleLabel.setText(I18n.t("subtitle"));
         inputsTitleLabel.setText(I18n.t("section.inputs"));
-        autoHintLabel.setText(I18n.t("hint.auto"));
         laserPowerLabel.setText(I18n.t("label.laserPower"));
         efficiencyLabel.setText(I18n.t("label.efficiency"));
         powerFactorLabel.setText(I18n.t("label.powerFactor"));
         inletTempLabel.setText(I18n.t("label.inletTemp"));
         maxWallTempLabel.setText(I18n.t("label.maxWallTemp"));
         maxWaterRiseLabel.setText(I18n.t("label.maxWaterRise"));
-        materialLabel.setText(I18n.t("label.material"));
-        wallThicknessLabel.setText(I18n.t("label.wallThickness"));
-        maxPressureLabel.setText(I18n.t("label.maxPressure"));
-        bendsLabel.setText(I18n.t("label.bends"));
-        bendRadiusLabel.setText(I18n.t("label.bendRadius"));
-        optimizerTitleLabel.setText(I18n.t("section.optimizer"));
-        optimizerHintLabel.setText(I18n.t("hint.optimizer"));
-        minHeaderLabel.setText(I18n.t("opt.min"));
-        maxHeaderLabel.setText(I18n.t("opt.max"));
-        searchHeaderLabel.setText(I18n.t("opt.search"));
-        innerDiameterLabel.setText(I18n.t("label.innerDiameter"));
-        lengthLabel.setText(I18n.t("label.length"));
-        flowLabel.setText(I18n.t("label.flow"));
-        iterationsLabel.setText(I18n.t("opt.iterations"));
+        maxWaterRiseField.setPromptText(I18n.t("prompt.optional"));
+        plateTitleLabel.setText(I18n.t("section.plate"));
+        plateSelectLabel.setText(I18n.t("label.plate"));
+        circuitLabel.setText(I18n.t("label.circuit"));
+        outletPressureLabel.setText(I18n.t("label.outletPressure"));
+        chillerPressureLabel.setText(I18n.t("label.chillerPressure"));
         calculateButton.setText(I18n.t("button.calculate"));
-        optimizeButton.setText(I18n.t("button.optimize"));
         resultsTitleLabel.setText(I18n.t("section.results"));
-        maxPowerResultLabel.setText(I18n.t("result.maxPower"));
-        apparentPowerResultLabel.setText(I18n.t("result.apparentPower"));
-        chillerResultLabel.setText(I18n.t("result.chiller"));
-        recommendedFlowResultLabel.setText(I18n.t("result.recommendedFlow"));
+        named(maxPowerResultLabel, "P_max", "result.maxPower");
+        named(apparentPowerResultLabel, "S_max", "result.apparentPower");
+        named(chillerResultLabel, "Q", "result.chiller");
+        named(recommendedFlowResultLabel, null, "result.recommendedFlow");
         channelResultsTitleLabel.setText(I18n.t("section.heatSink"));
-        innerDiameterResultLabel.setText(I18n.t("result.innerDiameter"));
-        outerDiameterResultLabel.setText(I18n.t("result.outerDiameter"));
-        lengthResultLabel.setText(I18n.t("result.length"));
-        flowResultLabel.setText(I18n.t("result.flow"));
-        velocityResultLabel.setText(I18n.t("result.velocity"));
-        reynoldsResultLabel.setText(I18n.t("result.reynolds"));
-        regimeResultLabel.setText(I18n.t("result.regime"));
-        htcResultLabel.setText(I18n.t("result.htc"));
-        waterRiseResultLabel.setText(I18n.t("result.waterRise"));
-        outletTempResultLabel.setText(I18n.t("result.outletTemp"));
-        wallTempResultLabel.setText(I18n.t("result.wallTemp"));
-        efficiencyResultLabel.setText(I18n.t("result.efficiency"));
-        pressureResultLabel.setText(I18n.t("result.pressure"));
-        serpentineResultLabel.setText(I18n.t("result.serpentine"));
-        localLossResultLabel.setText(I18n.t("result.localLoss"));
-        resistanceResultLabel.setText(I18n.t("result.resistance"));
-        evaluatedResultLabel.setText(I18n.t("result.evaluated"));
-        feasibleResultLabel.setText(I18n.t("result.feasible"));
-        recommendationTitleLabel.setText(I18n.t("section.recommendation"));
-        refreshMaterialBox();
+        named(lengthResultLabel, "L", "result.length");
+        named(flowResultLabel, "V̇", "result.flow");
+        named(velocityResultLabel, "v", "result.velocity");
+        named(reynoldsResultLabel, "Re", "result.reynolds");
+        named(regimeResultLabel, null, "result.regime");
+        named(htcResultLabel, "α", "result.htc");
+        named(waterRiseResultLabel, "ΔT", "result.waterRise");
+        named(outletTempResultLabel, "T_out", "result.outletTemp");
+        named(wallTempResultLabel, "T_w", "result.wallTemp");
+        named(plateTempResultLabel, "T_Al", "result.plateTemp");
+        named(timeConstantResultLabel, "τ", "result.timeConstant");
+        named(pressureResultLabel, "ΔP", "result.pressure");
+        named(localLossResultLabel, "K", "result.localLoss");
+        refreshPlateBox();
+        refreshCircuitBox();
+        updateCircuitFields();
         updateWindowTitle();
     }
 
-    private void refreshMaterialBox() {
-        TubeMaterial selected = materialBox.getValue();
-        materialBox.setConverter(materialConverter());
-        materialBox.getItems().setAll(TubeMaterial.values());
-        materialBox.setValue(selected);
+    private void hideNativeTabHeader() {
+        var header = mainTabs.lookup(".tab-header-area");
+        if (header != null) {
+            header.setVisible(false);
+            header.setManaged(false);
+        }
+    }
+
+    private void updateTabSwitcher() {
+        Tab selected = mainTabs.getSelectionModel().getSelectedItem();
+        boolean charts = selected == chartsTab;
+        calcTabButton.getStyleClass().remove("tab-switch-selected");
+        chartsTabButton.getStyleClass().remove("tab-switch-selected");
+        diagramTabButton.getStyleClass().remove("tab-switch-selected");
+        if (charts) {
+            chartsTabButton.getStyleClass().add("tab-switch-selected");
+        } else if (selected == diagramTab) {
+            diagramTabButton.getStyleClass().add("tab-switch-selected");
+        } else {
+            calcTabButton.getStyleClass().add("tab-switch-selected");
+        }
+    }
+
+    private void refreshSymbols() {
+        HBox[] items = {
+                symbol("T_in", "legend.Tin"),
+                symbol("T_out", "legend.Tout"),
+                symbol("T_b", "legend.Tb"),
+                symbol("T_w", "legend.Tw"),
+                symbol("T_Al", "legend.TAl"),
+                symbol("ΔT", "legend.dT"),
+                symbol("τ", "legend.tau"),
+                symbol("Q", "legend.Q"),
+                symbol("α", "legend.alpha"),
+                symbol("R_wall", "legend.Rwall"),
+                symbol("P_max", "legend.Pmax"),
+                symbol("S_max", "legend.Smax"),
+                symbol("η", "legend.eta"),
+                symbol("V̇", "legend.Vdot"),
+                symbol("v", "legend.v"),
+                symbol("ṁ", "legend.mdot"),
+                symbol("P_in", "legend.Pin"),
+                symbol("P_out", "legend.Pout"),
+                symbol("ΔP", "legend.dP"),
+                symbol("K", "legend.K"),
+                symbol("f", "legend.f"),
+                symbol("L", "legend.L"),
+                symbol("d", "legend.d"),
+                symbol("S", "legend.S"),
+                symbol("Re", "legend.Re"),
+                symbol("Nu", "legend.Nu"),
+                symbol("λ", "legend.lambda"),
+                symbol("ρ", "legend.rho"),
+                symbol("c_p", "legend.cp")
+        };
+        symbolsPane.getChildren().clear();
+        symbolsPane.getColumnConstraints().setAll(
+                percentColumn(), percentColumn(), percentColumn(), percentColumn());
+        int columns = 4;
+        int rows = (items.length + columns - 1) / columns;
+        for (int i = 0; i < items.length; i++) {
+            int column = i / rows;
+            int row = i % rows;
+            GridPane.setHgrow(items[i], Priority.ALWAYS);
+            GridPane.setFillWidth(items[i], true);
+            symbolsPane.add(items[i], column, row);
+        }
+    }
+
+    private static ColumnConstraints percentColumn() {
+        ColumnConstraints column = new ColumnConstraints();
+        column.setPercentWidth(25);
+        column.setHgrow(Priority.ALWAYS);
+        return column;
+    }
+
+    private static HBox symbol(String name, String meaningKey) {
+        TextFlow symbol = Formula.flow(name);
+        symbol.getStyleClass().add("formula-chip");
+        Label meaning = new Label(" — " + I18n.t(meaningKey));
+        meaning.getStyleClass().add("symbol-item");
+        meaning.setWrapText(true);
+        meaning.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(meaning, Priority.ALWAYS);
+        HBox box = new HBox(0, symbol, meaning);
+        box.setAlignment(Pos.CENTER_LEFT);
+        box.setMaxWidth(Double.MAX_VALUE);
+        return box;
+    }
+
+    private static void named(Label label, String symbol, String key) {
+        label.setText(I18n.t(key));
+        if (symbol == null || symbol.isBlank()) {
+            label.setGraphic(null);
+            return;
+        }
+        TextFlow graphic = Formula.flow(symbol);
+        graphic.getStyleClass().add("formula-chip");
+        label.setGraphic(graphic);
+        label.setContentDisplay(ContentDisplay.LEFT);
+        label.setGraphicTextGap(8);
+    }
+
+    private void refreshCircuitBox() {
+        CircuitLoop selected = circuitBox.getValue();
+        circuitBox.setConverter(circuitConverter());
+        circuitBox.getItems().setAll(CircuitLoop.values());
+        circuitBox.setValue(selected != null ? selected : CircuitLoop.CLOSED_CHILLER);
+    }
+
+    private void loadPlateCatalog() {
+        plateCatalog = PlateCatalog.load();
+        plateBox.setConverter(plateConverter());
+        plateBox.getItems().setAll(plateCatalog.plates());
+        if (!plateCatalog.plates().isEmpty()) {
+            plateBox.getSelectionModel().select(plateCatalog.plates().getFirst());
+        }
+    }
+
+    private void refreshPlateBox() {
+        PlateDefinition selected = plateBox.getValue();
+        plateBox.setConverter(plateConverter());
+        if (plateCatalog != null) {
+            plateBox.getItems().setAll(plateCatalog.plates());
+            if (selected != null) {
+                plateBox.setValue(plateCatalog.byId(selected.id()));
+            } else if (!plateCatalog.plates().isEmpty()) {
+                plateBox.setValue(plateCatalog.plates().getFirst());
+            }
+        }
+        updatePlateSummary(plateBox.getValue());
+    }
+
+    private void updatePlateSummary(PlateDefinition plate) {
+        if (plate == null) {
+            plateSummaryArea.setText("");
+            return;
+        }
+        plateSummaryArea.setText(plateSummary(plate));
+    }
+
+    private CoolingRequest lastCalculatedRequest() {
+        return lastRequest;
+    }
+
+    private static String dash(String value) {
+        return value == null || value.isBlank() ? "—" : value;
+    }
+
+    private static String plateSummary(PlateDefinition plate) {
+        boolean massFromDrawing = plate.plate().massKg() != null && !plate.plate().massEstimated();
+        return I18n.t(
+                "plate.summary",
+                plate.displayName(),
+                plate.plate().widthMm(),
+                plate.plate().heightMm(),
+                plate.plate().thicknessMm(),
+                plate.plate().thicknessEstimated() ? I18n.t("plate.estimated") : "",
+                plate.plate().resolvedMassKg(),
+                massFromDrawing ? "" : I18n.t("plate.estimated"),
+                plate.tube().innerDiameterMm(),
+                plate.tube().outerDiameterMm(),
+                plate.tube().wallThicknessMm(),
+                dash(plate.tube().standard()),
+                plate.layout().passes(),
+                plate.layout().pitchMm(),
+                plate.layout().bendRadiusMm()
+        );
+    }
+
+    private void updateCircuitFields() {
+        boolean closed = circuitBox.getValue() == CircuitLoop.CLOSED_CHILLER;
+        outletPressureLabel.setVisible(closed);
+        outletPressureLabel.setManaged(closed);
+        outletPressureField.setVisible(closed);
+        outletPressureField.setManaged(closed);
+        if (!closed) {
+            outletPressureField.setText("0");
+        }
     }
 
     private void updateWindowTitle() {
@@ -315,56 +534,31 @@ public class ResultController {
     }
 
     private CoolingRequest readRequest() {
+        PlateDefinition selected = plateBox.getValue();
+        if (selected == null) {
+            throw new IllegalArgumentException(I18n.t("error.noPlate"));
+        }
+        var cooling = selected.toCoolingPlate();
+        var layout = cooling.fixedLayout();
+        int bends = layout != null ? layout.uBends() : Math.max(0, selected.layout().passes() - 1);
+        double lengthM = layout != null && layout.developedLengthM() > 0 ? layout.developedLengthM() : 1.0;
         return new CoolingRequest(
                 required("label.laserPower", laserPowerField),
                 required("label.efficiency", efficiencyField) / 100.0,
                 required("label.powerFactor", powerFactorField),
                 required("label.inletTemp", inletTempField),
                 required("label.maxWallTemp", maxWallTempField),
-                required("label.maxWaterRise", maxWaterRiseField),
-                materialBox.getValue(),
-                required("label.wallThickness", wallThicknessField) / 1000.0,
-                required("label.innerDiameter", innerDiameterField) / 1000.0,
-                required("label.length", lengthField) / 1000.0,
-                required("label.flow", flowField) / 60_000.0,
-                required("label.maxPressure", maxPressureField) * 1e5,
-                (int) Math.round(required("label.bends", bendsField)),
-                required("label.bendRadius", bendRadiusField) / 1000.0
+                optional("label.maxWaterRise", maxWaterRiseField),
+                selected.tube().tubeMaterial(),
+                selected.tube().wallThicknessMm() / 1000.0,
+                selected.tube().innerDiameterMm() / 1000.0,
+                lengthM,
+                outletPressurePa(),
+                required("label.chillerPressure", chillerPressureField) * 1e5,
+                bends,
+                selected.layout().bendRadiusMm() / 1000.0,
+                cooling
         );
-    }
-
-    private ChartsController.Input readChartInput() {
-        CoolingRequest request = readRequest();
-        return new ChartsController.Input(
-                request,
-                required("opt.min", innerDiameterField) / 1000.0,
-                required("opt.max", diameterMaxField) / 1000.0,
-                required("opt.min", lengthField) / 1000.0,
-                required("opt.max", lengthMaxField) / 1000.0,
-                required("opt.min", flowField) / 60_000.0,
-                required("opt.max", flowMaxField) / 60_000.0
-        );
-    }
-
-    private OptimizerSettings readOptimizerSettings() {
-        return new OptimizerSettings(
-                required("opt.min", innerDiameterField) / 1000.0,
-                required("opt.max", diameterMaxField) / 1000.0,
-                varyDiameterBox.isSelected(),
-                required("opt.min", lengthField) / 1000.0,
-                required("opt.max", lengthMaxField) / 1000.0,
-                varyLengthBox.isSelected(),
-                required("opt.min", flowField) / 60_000.0,
-                required("opt.max", flowMaxField) / 60_000.0,
-                varyFlowBox.isSelected(),
-                (int) Math.round(required("opt.iterations", iterationsField))
-        );
-    }
-
-    private void showOutcome(OptimizerOutcome outcome) {
-        showResult(outcome.best());
-        evaluatedResult.setText(format(outcome.evaluated(), 0, null));
-        feasibleResult.setText(format(outcome.feasible(), 0, null));
     }
 
     private void showResult(CoolingResult result) {
@@ -372,8 +566,6 @@ public class ResultController {
         apparentPowerResult.setText(format(result.apparentPowerVa() / 1000.0, 1, "unit.kva"));
         chillerResult.setText(format(result.chillerCapacityW() / 1000.0, 1, "unit.kw"));
         recommendedFlowResult.setText(format(result.recommendedFlowM3s() * 60_000.0, 0, "unit.lmin"));
-        innerDiameterResult.setText(format(result.innerDiameterM() * 1000.0, 1, "unit.mm"));
-        outerDiameterResult.setText(format(result.outerDiameterM() * 1000.0, 1, "unit.mm"));
         lengthResult.setText(format(result.lengthM() * 1000.0, 0, "unit.mm"));
         flowResult.setText(format(result.volumeFlowM3s() * 60_000.0, 2, "unit.lmin"));
         velocityResult.setText(format(result.velocityMps(), 2, "unit.mps"));
@@ -383,26 +575,24 @@ public class ResultController {
         waterRiseResult.setText(format(result.waterRiseK(), 2, "unit.celsius"));
         outletTempResult.setText(format(result.outletTempC(), 1, "unit.celsius"));
         wallTempResult.setText(format(result.outerWallTempC(), 1, "unit.celsius"));
-        efficiencyResult.setText(format(result.coolingConductanceWPerK(), 2, "unit.wPerK"));
+        plateTempResult.setText(format(result.plateTempC(), 1, "unit.celsius"));
+        timeConstantResult.setText(format(result.timeConstantS(), 1, "unit.s"));
         pressureResult.setText(format(result.pressureDropPa() / 1e5, 3, "unit.bar"));
-        if (result.uBends() <= 0) {
-            serpentineResult.setText(I18n.t("result.straightChannel"));
-        } else {
-            serpentineResult.setText(I18n.t(
-                    "result.serpentineValue",
-                    result.uBends(),
-                    result.bendRadiusM() * 1000.0
-            ));
-        }
         localLossResult.setText(format(result.localLossK(), 2, null));
-        resistanceResult.setText(format(result.thermalResistanceKw() * 1000.0, 2, "unit.kPerKw"));
-        recommendationArea.setText(result.recommendation());
     }
 
     private void setStatus(String message, boolean error) {
         statusLabel.setText(message);
         statusLabel.getStyleClass().removeAll("status-ok", "status-error");
         statusLabel.getStyleClass().add(error ? "status-error" : "status-ok");
+    }
+
+    private static Double optional(String labelKey, TextField field) {
+        String raw = field.getText();
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        return parse(labelKey, raw);
     }
 
     private static double required(String labelKey, TextField field) {
@@ -433,17 +623,39 @@ public class ResultController {
         return unitKey == null ? number : number + " " + I18n.t(unitKey);
     }
 
-    private static StringConverter<TubeMaterial> materialConverter() {
+    private double outletPressurePa() {
+        if (circuitBox.getValue() != CircuitLoop.CLOSED_CHILLER) {
+            return 0.0;
+        }
+        return required("label.outletPressure", outletPressureField) * 1e5;
+    }
+
+    private static StringConverter<PlateDefinition> plateConverter() {
         return new StringConverter<>() {
             @Override
-            public String toString(TubeMaterial material) {
-                return material == null ? "" : I18n.t("material." + material.name());
+            public String toString(PlateDefinition plate) {
+                return plate == null ? "" : plate.displayName();
             }
 
             @Override
-            public TubeMaterial fromString(String string) {
+            public PlateDefinition fromString(String string) {
                 return null;
             }
         };
     }
+
+    private static StringConverter<CircuitLoop> circuitConverter() {
+        return new StringConverter<>() {
+            @Override
+            public String toString(CircuitLoop loop) {
+                return loop == null ? "" : I18n.t("circuit." + loop.name());
+            }
+
+            @Override
+            public CircuitLoop fromString(String string) {
+                return null;
+            }
+        };
+    }
+
 }

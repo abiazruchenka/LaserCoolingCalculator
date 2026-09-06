@@ -6,7 +6,7 @@
 
     <groupId>ipg.cooling</groupId>
     <artifactId>LaserCoolingCalculator</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <name>LaserCoolingCalculator</name>
     <developers>
         <developer>
@@ -36,7 +36,6 @@
             <artifactId>javafx-web</artifactId>
             <version>21.0.6</version>
         </dependency>
-
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>

@@ -11,10 +11,10 @@ public class LaserCoolingApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(LaserCoolingApplication.class.getResource("laser-cooling-calculate-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 1180, 720);
+        Scene scene = new Scene(fxmlLoader.load(), 1480, 880);
         stage.setTitle(I18n.t("window.title"));
-        stage.setMinWidth(980);
-        stage.setMinHeight(640);
+        stage.setMinWidth(1400);
+        stage.setMinHeight(820);
         stage.setScene(scene);
         stage.show();
     }

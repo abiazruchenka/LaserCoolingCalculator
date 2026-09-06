@@ -12,19 +12,14 @@ import java.nio.charset.StandardCharsets;
 
 final class HelpWindow {
     private static Stage stage;
+    private static WebView webView;
 
     private HelpWindow() {
     }
 
     static void show(Window owner) {
-        if (stage != null && stage.isShowing()) {
-            stage.setTitle(I18n.t("help.title"));
-            stage.toFront();
-            return;
-        }
         if (stage == null) {
-            WebView webView = new WebView();
-            webView.getEngine().loadContent(html(), "text/html");
+            webView = new WebView();
             Scene scene = new Scene(new BorderPane(webView), 860, 720);
             stage = new Stage();
             stage.setMinWidth(640);
@@ -34,6 +29,7 @@ final class HelpWindow {
             }
             stage.setScene(scene);
         }
+        webView.getEngine().loadContent(html(), "text/html");
         stage.setTitle(I18n.t("help.title"));
         stage.show();
         stage.toFront();

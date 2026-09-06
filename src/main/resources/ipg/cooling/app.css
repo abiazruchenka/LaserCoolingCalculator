@@ -4,35 +4,35 @@
     -fx-font-size: 13px;
 }
 
-.header-row {
-    -fx-padding: 0 0 6 0;
+.app-header {
+    -fx-padding: 0 0 10 0;
 }
 
-.app-menu {
+.header-button {
     -fx-background-color: white;
     -fx-border-color: #d5dee7;
-    -fx-background-radius: 6;
     -fx-border-radius: 6;
-    -fx-padding: 2 8;
+    -fx-background-radius: 6;
+    -fx-padding: 4 12;
     -fx-min-height: 28;
-}
-
-.app-menu .label {
     -fx-text-fill: #12324d;
 }
 
-.lang-button {
-    -fx-background-color: white;
-    -fx-border-color: #d5dee7;
-    -fx-border-radius: 6;
-    -fx-background-radius: 6;
-    -fx-padding: 4 10;
-    -fx-font-weight: bold;
-    -fx-min-width: 64;
+.header-button:hover,
+.header-button:showing {
+    -fx-background-color: #e8eef4;
+}
+
+.header-button .arrow-button {
+    -fx-padding: 0 0 0 6;
+}
+
+.header-button .arrow {
+    -fx-background-color: #5a6b7b;
 }
 
 .app-title {
-    -fx-font-size: 18px;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
     -fx-text-fill: #12324d;
 }
@@ -45,7 +45,7 @@
 .card {
     -fx-background-color: white;
     -fx-background-radius: 8;
-    -fx-padding: 10;
+    -fx-padding: 14;
     -fx-effect: dropshadow(gaussian, rgba(18, 50, 77, 0.08), 10, 0, 0, 1);
 }
 
@@ -58,6 +58,7 @@
 .field-label {
     -fx-text-fill: #12324d;
     -fx-font-size: 12px;
+    -fx-text-overrun: clip;
 }
 
 .hint {
@@ -68,14 +69,9 @@
 .value {
     -fx-font-weight: bold;
     -fx-text-fill: #0b5cab;
-    -fx-min-width: 70;
+    -fx-min-width: 110;
     -fx-font-size: 13px;
-}
-
-.value-best {
-    -fx-text-fill: #067647;
-    -fx-font-size: 13px;
-    -fx-min-width: 70;
+    -fx-wrap-text: false;
 }
 
 .status {
@@ -111,16 +107,8 @@
     -fx-background-color: #094a89;
 }
 
-.secondary {
-    -fx-background-color: #e8eef4;
-    -fx-text-fill: #12324d;
-    -fx-font-weight: bold;
-    -fx-padding: 5 12;
-    -fx-background-radius: 6;
-}
-
-.secondary:hover {
-    -fx-background-color: #d5dee7;
+.calculate {
+    -fx-padding: 5 22;
 }
 
 .root-scroll {
@@ -153,35 +141,129 @@
     -fx-background-color: transparent;
 }
 
-.app-tabs .tab {
-    -fx-background-color: #e8eef4;
-    -fx-background-radius: 6 6 0 0;
-    -fx-padding: 4 12;
-}
-
-.app-tabs .tab:selected {
-    -fx-background-color: white;
-}
-
-.app-tabs .tab .tab-label {
-    -fx-text-fill: #12324d;
-    -fx-font-weight: bold;
+.app-tabs > .tab-header-area {
+    visibility: hidden;
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+    -fx-min-height: 0;
+    -fx-padding: 0;
 }
 
 .app-tabs .tab-content-area {
     -fx-background-color: transparent;
-    -fx-padding: 8 0 0 0;
+    -fx-padding: 0;
 }
 
-.chart-toolbar {
-    -fx-padding: 0 0 4 0;
+.tab-rail {
+    -fx-padding: 0 10 0 0;
+}
+
+.diagram-card {
+    -fx-alignment: TOP_CENTER;
+}
+
+.tab-switch {
+    -fx-background-color: white;
+    -fx-text-fill: #5a6b7b;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-border-color: #d5dee7;
+    -fx-border-radius: 6;
+    -fx-padding: 8 12;
+    -fx-alignment: CENTER_LEFT;
+    -fx-min-width: 128;
+}
+
+.tab-switch:hover {
+    -fx-background-color: #e8eef4;
+}
+
+.tab-switch-selected {
+    -fx-background-color: #0b5cab;
+    -fx-text-fill: white;
+    -fx-border-color: #0b5cab;
+}
+
+.tab-switch-selected:hover {
+    -fx-background-color: #094a89;
+    -fx-text-fill: white;
+}
+
+.symbols-bar {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-padding: 10 14;
+    -fx-alignment: TOP_LEFT;
+    -fx-effect: dropshadow(gaussian, rgba(18, 50, 77, 0.06), 8, 0, 0, 1);
+}
+
+.symbol-item {
+    -fx-text-fill: #5a6b7b;
+    -fx-font-size: 11px;
+    -fx-wrap-text: true;
+}
+
+.chart-card {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-padding: 8 10 6 10;
+    -fx-effect: dropshadow(gaussian, rgba(18, 50, 77, 0.08), 8, 0, 0, 1);
+}
+
+.chart-formula {
+    -fx-font-family: "Cambria Math", "Times New Roman", serif;
+    -fx-font-size: 13px;
+}
+
+.formula-chip .formula-var,
+.formula-chip .formula-plain {
+    -fx-font-size: 13px;
+}
+
+.formula-chip .formula-sub {
+    -fx-font-size: 9px;
+}
+
+.diagram-view {
+    -fx-min-height: 0;
+}
+
+.formula-var {
+    -fx-font-family: "Cambria Math", "Times New Roman", serif;
+    -fx-font-style: italic;
+    -fx-font-size: 15px;
+    -fx-fill: #12324d;
+}
+
+.formula-sub {
+    -fx-font-family: "Cambria Math", "Times New Roman", serif;
+    -fx-font-style: normal;
+    -fx-font-size: 10px;
+    -fx-fill: #12324d;
+}
+
+.formula-plain {
+    -fx-font-family: "Cambria Math", "Times New Roman", serif;
+    -fx-font-size: 15px;
+    -fx-fill: #12324d;
+}
+
+.about-body .formula-plain {
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 13px;
+}
+
+.about-body .formula-var {
+    -fx-font-size: 14px;
+}
+
+.about-body .formula-sub {
+    -fx-font-size: 9px;
 }
 
 .design-chart {
-    -fx-background-color: white;
-    -fx-background-radius: 8;
-    -fx-padding: 4 8 6 6;
-    -fx-effect: dropshadow(gaussian, rgba(18, 50, 77, 0.08), 8, 0, 0, 1);
+    -fx-background-color: transparent;
+    -fx-padding: 0;
 }
 
 .design-chart .chart-title {

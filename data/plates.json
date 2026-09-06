@@ -1,0 +1,367 @@
+{
+  "version": 1,
+  "note": "Human-filled from the ML-X drawings. Millimetres and bar. The program computes U-bends and developed length unless developedLengthMm is given.",
+  "plates": [
+    {
+      "id": "ML-770",
+      "name": "ML-770",
+      "drawing": "7025.326.010.02",
+      "ipgNumber": "CM702532601002XG",
+      "source": "7025.326.010.02 Rohr Kühlplatte ML-770",
+      "plate": {
+        "material": "EN AC-AlSi10Mg(Fe)",
+        "widthMm": 445.5,
+        "heightMm": 547.9,
+        "thicknessMm": 20,
+        "massKg": 10.34,
+        "massEstimated": false,
+        "thicknessEstimated": false,
+        "conductivityWmk": 150,
+        "specificHeatJkgK": 900,
+        "edgeMarginMm": 20
+      },
+      "tube": {
+        "material": "STAINLESS_STEEL",
+        "standard": "1.4301 / X5CrNi18-10",
+        "innerDiameterMm": 10.9,
+        "outerDiameterMm": 12.7,
+        "wallThicknessMm": 0.9,
+        "massKg": 1.0      },
+      "layout": {
+        "orientation": "ALONG_WIDTH",
+        "passes": 8,
+        "pitchMm": 56,
+        "bendRadiusMm": 28
+      },
+      "hydraulics": {
+        "leakTestBarMin": 7.5,
+        "leakTestBarMax": 8.5,
+        "leakTestIsOperatingPressure": false
+      }
+    },
+    {
+      "id": "ML-780",
+      "name": "ML-780",
+      "drawing": "7020.200.002.00",
+      "ipgNumber": "CM702020000200XG",
+      "source": "7020.200.002.00 Rohr 2 Kühlplatte ML-780 (Guß)",
+      "notes": "Tube drawing only. Cast-plate mass and thickness estimated. Coil envelope 232 × 666.35 mm. Developed length L = 2720 mm from the title block.",
+      "plate": {
+        "material": "EN AC-AlSi10Mg(Fe)",
+        "widthMm": 232,
+        "heightMm": 666.35,
+        "thicknessMm": 20,
+        "thicknessEstimated": true,
+        "conductivityWmk": 150,
+        "specificHeatJkgK": 900,
+        "edgeMarginMm": 20
+      },
+      "tube": {
+        "material": "STAINLESS_STEEL",
+        "standard": "1.4301 / X5CrNi18-10",
+        "innerDiameterMm": 10.9,
+        "outerDiameterMm": 12.7,
+        "wallThicknessMm": 0.9,
+        "massKg": 0.76      },
+      "layout": {
+        "orientation": "ALONG_HEIGHT",
+        "passes": 3,
+        "pitchMm": 70,
+        "bendRadiusMm": 23,
+        "developedLengthMm": 2720
+      },
+      "hydraulics": {
+        "leakTestBarMin": 7.5,
+        "leakTestBarMax": 8.5,
+        "leakTestIsOperatingPressure": false
+      }
+    },
+    {
+      "id": "ML-781",
+      "name": "ML-781",
+      "drawing": "7020.201.001.00",
+      "ipgNumber": "CM702020100100XG",
+      "source": "7020.201.001.00 Doppelrohr Ø10×1 Kühlplatte ML-781 (Guß)",
+      "notes": "Two parallel Ø10×1 tubes. The calculator models one tube; if both run in parallel, ΔP is lower than shown.",
+      "plate": {
+        "material": "EN AC-AlSi10Mg(Fe)",
+        "widthMm": 360,
+        "heightMm": 715,
+        "thicknessMm": 20,
+        "thicknessEstimated": true,
+        "conductivityWmk": 150,
+        "specificHeatJkgK": 900,
+        "edgeMarginMm": 20
+      },
+      "tube": {
+        "material": "STAINLESS_STEEL",
+        "standard": "1.4301 / X5CrNi18-10",
+        "innerDiameterMm": 8.0,
+        "outerDiameterMm": 10.0,
+        "wallThicknessMm": 1.0,
+        "massKg": 2.58      },
+      "layout": {
+        "orientation": "ALONG_HEIGHT",
+        "passes": 5,
+        "pitchMm": 70,
+        "bendRadiusMm": 20
+      },
+      "hydraulics": {
+        "leakTestBarMin": 7.5,
+        "leakTestBarMax": 8.5,
+        "leakTestIsOperatingPressure": false
+      }
+    },
+    {
+      "id": "ML-783",
+      "name": "ML-783",
+      "drawing": "7020.203.001.00",
+      "ipgNumber": "CM702020300100XG",
+      "source": "7020.203.001.00 Rohr 1 Kühlplatte ML-783",
+      "plate": {
+        "material": "EN AC-AlSi10Mg(Fe)",
+        "widthMm": 409.9,
+        "heightMm": 719.35,
+        "thicknessMm": 20,
+        "thicknessEstimated": true,
+        "conductivityWmk": 150,
+        "specificHeatJkgK": 900,
+        "edgeMarginMm": 40
+      },
+      "tube": {
+        "material": "STAINLESS_STEEL",
+        "standard": "1.4301 / X5CrNi18-10",
+        "innerDiameterMm": 10.92,
+        "outerDiameterMm": 12.7,
+        "wallThicknessMm": 0.89,
+        "massKg": 1.78      },
+      "layout": {
+        "orientation": "ALONG_WIDTH",
+        "passes": 13,
+        "pitchMm": 44,
+        "bendRadiusMm": 22
+      },
+      "hydraulics": {
+        "leakTestBarMin": 7.5,
+        "leakTestBarMax": 8.5,
+        "leakTestIsOperatingPressure": false
+      }
+    },
+    {
+      "id": "ML-784",
+      "name": "ML-784",
+      "drawing": "7020.204.001.00",
+      "ipgNumber": "CM702020400100XG",
+      "source": "7020.204.001.00 Rohr 1 Kühlplatte ML-784",
+      "plate": {
+        "material": "EN AC-AlSi10Mg(Fe)",
+        "widthMm": 409.9,
+        "heightMm": 722.35,
+        "thicknessMm": 20,
+        "thicknessEstimated": true,
+        "conductivityWmk": 150,
+        "specificHeatJkgK": 900,
+        "edgeMarginMm": 40
+      },
+      "tube": {
+        "material": "STAINLESS_STEEL",
+        "standard": "1.4301 / X5CrNi18-10",
+        "innerDiameterMm": 10.92,
+        "outerDiameterMm": 12.7,
+        "wallThicknessMm": 0.89,
+        "massKg": 1.79      },
+      "layout": {
+        "orientation": "ALONG_WIDTH",
+        "passes": 13,
+        "pitchMm": 46,
+        "bendRadiusMm": 23
+      },
+      "hydraulics": {
+        "leakTestBarMin": 7.5,
+        "leakTestBarMax": 8.5,
+        "leakTestIsOperatingPressure": false
+      }
+    },
+    {
+      "id": "ML-785",
+      "name": "ML-785",
+      "drawing": "7020.205.001.00 A",
+      "ipgNumber": "CM702020500100XG",
+      "source": "7020.205.001.00 A Rohr Kühlplatte ML-785",
+      "plate": {
+        "material": "EN AC-AlSi10Mg(Fe)",
+        "widthMm": 409.9,
+        "heightMm": 721.8,
+        "thicknessMm": 20,
+        "thicknessEstimated": true,
+        "conductivityWmk": 150,
+        "specificHeatJkgK": 900,
+        "edgeMarginMm": 40
+      },
+      "tube": {
+        "material": "STAINLESS_STEEL",
+        "standard": "1.4301 / X5CrNi18-10",
+        "innerDiameterMm": 12.0,
+        "outerDiameterMm": 14.0,
+        "wallThicknessMm": 1.0,
+        "massKg": 2.18      },
+      "layout": {
+        "orientation": "ALONG_WIDTH",
+        "passes": 13,
+        "pitchMm": 44.7,
+        "bendRadiusMm": 22.35
+      },
+      "hydraulics": {
+        "leakTestBarMin": 7.5,
+        "leakTestBarMax": 8.5,
+        "leakTestIsOperatingPressure": false
+      }
+    },
+    {
+      "id": "ML-786",
+      "name": "ML-786",
+      "drawing": "7020.206.001.00 A",
+      "ipgNumber": "CM702020600100XG",
+      "source": "7020.206.001.00 A Rohr Kühlplatte ML-786",
+      "plate": {
+        "material": "EN AC-AlSi10Mg(Fe)",
+        "widthMm": 409.9,
+        "heightMm": 721.8,
+        "thicknessMm": 20,
+        "thicknessEstimated": true,
+        "conductivityWmk": 150,
+        "specificHeatJkgK": 900,
+        "edgeMarginMm": 40
+      },
+      "tube": {
+        "material": "STAINLESS_STEEL",
+        "standard": "1.4301 / X5CrNi18-10",
+        "innerDiameterMm": 13.0,
+        "outerDiameterMm": 14.0,
+        "wallThicknessMm": 0.5,
+        "massKg": 1.16      },
+      "layout": {
+        "orientation": "ALONG_WIDTH",
+        "passes": 13,
+        "pitchMm": 44.7,
+        "bendRadiusMm": 22.35
+      },
+      "hydraulics": {
+        "leakTestBarMin": 7.5,
+        "leakTestBarMax": 8.5,
+        "leakTestIsOperatingPressure": false
+      }
+    },
+    {
+      "id": "ML-789",
+      "name": "ML-789",
+      "drawing": "7020.209.001.00 A + 5729.100.000.00 D",
+      "ipgNumber": "CM702020900100XG",
+      "source": "7020.209.001.00 A Rohr; 5729.100.000.00 D Kühlplatte ML-789.13 / YLM-6000-U3-SM",
+      "notes": "Tube same as ML-785 (Ø14×1). Cast plate 445.5×735×20 mm, 15.6 kg from 5729.100.000.00 D.",
+      "plate": {
+        "material": "3.2381.01 EN AC-AlSi10Mg(Fe)",
+        "widthMm": 445.5,
+        "heightMm": 735,
+        "thicknessMm": 20,
+        "massKg": 15.6,
+        "massEstimated": false,
+        "thicknessEstimated": false,
+        "conductivityWmk": 150,
+        "specificHeatJkgK": 900,
+        "edgeMarginMm": 40
+      },
+      "tube": {
+        "material": "STAINLESS_STEEL",
+        "standard": "1.4301 / X5CrNi18-10",
+        "innerDiameterMm": 12.0,
+        "outerDiameterMm": 14.0,
+        "wallThicknessMm": 1.0,
+        "massKg": 2.18      },
+      "layout": {
+        "orientation": "ALONG_WIDTH",
+        "passes": 13,
+        "pitchMm": 44.7,
+        "bendRadiusMm": 22.35
+      },
+      "hydraulics": {
+        "leakTestBarMin": 7.5,
+        "leakTestBarMax": 8.5,
+        "leakTestIsOperatingPressure": false
+      }
+    },
+    {
+      "id": "ML-790",
+      "name": "ML-790",
+      "drawing": "7020.210.000.00",
+      "ipgNumber": "CM702021000000XG",
+      "source": "7020.210.000.00 ML-790 Kühlplatte 14×1 Rohr",
+      "notes": "Tube is flush and slightly flattened (14×9). Model uses circular Ø14×1. Drawing allows R max 25 mm; catalog uses pitch/2 = 22.35 mm. Alloy k ≥ 160±10 W/(m·K).",
+      "plate": {
+        "material": "3.2381.01 G-AlSi10Mg",
+        "widthMm": 445.5,
+        "heightMm": 720,
+        "thicknessMm": 20,
+        "massKg": 16.64,
+        "massEstimated": false,
+        "thicknessEstimated": false,
+        "conductivityWmk": 160,
+        "specificHeatJkgK": 900,
+        "edgeMarginMm": 40
+      },
+      "tube": {
+        "material": "STAINLESS_STEEL",
+        "standard": "1.4301 / X5CrNi18-10",
+        "innerDiameterMm": 12.0,
+        "outerDiameterMm": 14.0,
+        "wallThicknessMm": 1.0      },
+      "layout": {
+        "orientation": "ALONG_WIDTH",
+        "passes": 15,
+        "pitchMm": 44.7,
+        "bendRadiusMm": 22.35
+      },
+      "hydraulics": {
+        "leakTestBarMin": 7.5,
+        "leakTestBarMax": 8.5,
+        "leakTestIsOperatingPressure": false
+      }
+    },
+    {
+      "id": "ML-792",
+      "name": "ML-792",
+      "drawing": "7020.212.001.00",
+      "ipgNumber": "CM702021200100XG",
+      "source": "7020.212.001.00 Rohr Kühlplatte ML-792 (DRAFT)",
+      "notes": "Draft drawing. Same coil family as ML-785 (Ø14×1, 13 passes, pitch 44.7 mm).",
+      "plate": {
+        "material": "EN AC-AlSi10Mg(Fe)",
+        "widthMm": 409.9,
+        "heightMm": 722.3,
+        "thicknessMm": 20,
+        "thicknessEstimated": true,
+        "conductivityWmk": 150,
+        "specificHeatJkgK": 900,
+        "edgeMarginMm": 40
+      },
+      "tube": {
+        "material": "STAINLESS_STEEL",
+        "standard": "1.4301 / X5CrNi18-10",
+        "innerDiameterMm": 12.0,
+        "outerDiameterMm": 14.0,
+        "wallThicknessMm": 1.0,
+        "massKg": 2.3      },
+      "layout": {
+        "orientation": "ALONG_WIDTH",
+        "passes": 13,
+        "pitchMm": 44.7,
+        "bendRadiusMm": 22.35
+      },
+      "hydraulics": {
+        "leakTestBarMin": 7.5,
+        "leakTestBarMax": 8.5,
+        "leakTestIsOperatingPressure": false
+      }
+    }
+  ]
+}
